@@ -1,0 +1,173 @@
+---
+import Layout from '../layouts/Layout.astro'
+
+export const prerender = false
+---
+
+<Layout>
+  <main class="container mx-auto px-4 py-12 max-w-2xl">
+    <div class="text-center">
+      <h1 class="text-5xl font-extrabold tracking-tight">Mambruk</h1>
+      <p class="mt-3 text-lg text-neutral-600">
+        Pendekkan URL dan kumpulkan semua tautanmu dalam satu halaman.
+      </p>
+    </div>
+
+    <!-- Pemendek URL -->
+    <section
+      class="mt-10 bg-white border border-neutral-800 rounded-xl p-6 sm:p-8"
+    >
+      <p
+        class="text-xs font-semibold uppercase tracking-widest text-neutral-400 mb-4"
+      >
+        Pemendek URL
+      </p>
+
+      <form id="shortenForm" class="flex flex-col sm:flex-row gap-3">
+        <input
+          type="url"
+          id="urlInput"
+          name="url"
+          placeholder="https://contoh.com/tautan/yang/panjang"
+          required
+          class="flex-1 px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none transition-colors"
+        />
+        <button
+          type="submit"
+          id="shortenBtn"
+          class="px-6 py-3 rounded-lg bg-neutral-800 text-white font-semibold hover:bg-neutral-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Pendekkan
+        </button>
+      </form>
+
+      <div
+        id="result"
+        class="hidden mt-6 p-4 bg-neutral-50 border border-neutral-200 rounded-lg"
+      >
+        <label
+          for="shortUrl"
+          class="block text-sm font-semibold text-neutral-700 mb-2"
+        >
+          Tautan pendekmu:
+        </label>
+        <div class="flex flex-col sm:flex-row gap-2">
+          <input
+            type="text"
+            id="shortUrl"
+            readonly
+            class="flex-1 px-3 py-2 bg-white border border-neutral-300 rounded font-mono text-sm"
+          />
+          <button
+            id="copyBtn"
+            type="button"
+            class="px-4 py-2 rounded bg-neutral-800 text-white font-medium hover:bg-neutral-700 transition-colors"
+          >
+            Salin
+          </button>
+        </div>
+      </div>
+
+      <div
+        id="error"
+        class="hidden mt-6 p-4 bg-red-50 border border-red-200 rounded-lg"
+      >
+        <p class="text-red-800 font-medium"></p>
+      </div>
+    </section>
+
+    <!-- Halaman bio -->
+    <section
+      class="mt-6 bg-white border border-neutral-800 rounded-xl p-6 sm:p-8"
+    >
+      <p
+        class="text-xs font-semibold uppercase tracking-widest text-neutral-400 mb-4"
+      >
+        Halaman Bio
+      </p>
+      <p class="text-neutral-600">
+        Satu halaman untuk semua kanalmu, di
+        <span class="font-mono text-neutral-800">mambr.uk/@handle</span>.
+      </p>
+      <a
+        class="group relative inline-block mt-5 text-sm font-medium text-neutral-600 focus:outline-none active:text-neutral-800"
+        href="/@papuaopensource"
+      >
+        <span
+          class="absolute inset-0 translate-x-1.5 translate-y-1.5 bg-neutral-800 rounded"
+        ></span>
+        <span
+          class="relative flex items-center justify-center gap-3 rounded border border-neutral-800 bg-white px-5 py-3 group-hover:translate-x-1 group-hover:translate-y-1 group-focus:translate-x-1 group-focus:translate-y-1"
+        >
+          Lihat contoh: @papuaopensource
+        </span>
+      </a>
+      <p class="mt-4 text-sm text-neutral-500">
+        Bikin halamanmu sendiri: menyusul bersama akun dan dashboard.
+      </p>
+    </section>
+
+    <footer class="mt-12 text-center text-sm text-neutral-500">
+      <p>Kontribusi Berbasis Open Source untuk Tanah Papua</p>
+      <p class="mt-1">
+        &copy; 2026
+        <a
+          class="hover:text-neutral-800"
+          href="https://github.com/papuaopensource">Papua Open Source</a
+        >
+      </p>
+    </footer>
+  </main>
+</Layout>
+
+<script>
+  const form = document.getElementById('shortenForm') as HTMLFormElement
+  const urlInput = document.getElementById('urlInput') as HTMLInputElement
+  const shortenBtn = document.getElementById('shortenBtn') as HTMLButtonElement
+  const result = document.getElementById('result') as HTMLDivElement
+  const shortUrlInput = document.getElementById('shortUrl') as HTMLInputElement
+  const copyBtn = document.getElementById('copyBtn') as HTMLButtonElement
+  const error = document.getElementById('error') as HTMLDivElement
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault()
+    const url = urlInput.value.trim()
+    if (!url) return
+
+    shortenBtn.disabled = true
+    shortenBtn.textContent = 'Memproses...'
+    error.classList.add('hidden')
+    result.classList.add('hidden')
+
+    try {
+      const response = await fetch('/api/shorten', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url }),
+      })
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.error || 'Gagal memendekkan URL')
+
+      shortUrlInput.value = `${window.location.origin}/${data.code}`
+      result.classList.remove('hidden')
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Terjadi kesalahan'
+      error.querySelector('p')!.textContent = message
+      error.classList.remove('hidden')
+    } finally {
+      shortenBtn.disabled = false
+      shortenBtn.textContent = 'Pendekkan'
+    }
+  })
+
+  copyBtn.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(shortUrlInput.value)
+    } catch {
+      shortUrlInput.select()
+      document.execCommand('copy')
+    }
+    copyBtn.textContent = 'Tersalin!'
+    setTimeout(() => (copyBtn.textContent = 'Salin'), 2000)
+  })
+</script>
