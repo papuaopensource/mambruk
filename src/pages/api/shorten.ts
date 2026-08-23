@@ -90,7 +90,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     // Check if URL already exists
     const existing = await db
-      .prepare('SELECT code FROM links WHERE url = ?')
+      .prepare("SELECT code FROM links WHERE url = ? AND handle = ''")
       .bind(url)
       .first()
 
@@ -112,7 +112,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     do {
       code = generateCode()
       const existingCode = await db
-        .prepare('SELECT id FROM links WHERE code = ?')
+        .prepare("SELECT id FROM links WHERE code = ? AND handle = ''")
         .bind(code)
         .first()
 
@@ -128,7 +128,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     // Insert new link with metadata
     const result = await db
       .prepare(
-        'INSERT INTO links (code, url, created_at) VALUES (?, ?, datetime("now"))'
+        'INSERT INTO links (handle, code, url, created_at) VALUES (\'\', ?, ?, datetime("now"))'
       )
       .bind(code, url)
       .run()
