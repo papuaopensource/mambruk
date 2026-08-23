@@ -1,0 +1,49 @@
+---
+export interface Props {
+  title?: string
+  description?: string
+}
+
+const {
+  title = 'Mambruk — Pemendek URL & Halaman Bio',
+  description = 'Pendekkan URL dan buat halaman bio dalam satu tempat. Dari Papua Open Source.',
+} = Astro.props
+---
+
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="icon"
+      type="image/png"
+      href="/assets/favicon/favicon-96x96.png"
+      sizes="96x96"
+    />
+    <link rel="shortcut icon" href="/assets/favicon/favicon.ico" />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="/assets/favicon/apple-touch-icon.png"
+    />
+    <link rel="manifest" href="/assets/favicon/site.webmanifest" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="id_ID" />
+    <meta property="og:image" content="/assets/pos-logo.png" />
+    <meta name="twitter:card" content="summary" />
+    <link rel="preconnect" href="https://fonts.bunny.net" />
+    <link
+      href="https://fonts.bunny.net/css?family=inter-tight:400,500,600,700,800,900"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="min-h-screen bg-neutral-100 text-neutral-800">
+    <slot />
+  </body>
+</html>
