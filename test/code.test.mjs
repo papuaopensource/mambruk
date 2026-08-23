@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { isCode, isAlias, generateCode } from '../src/utils/code.js'
+import { isCode, isAlias, isHandle, generateCode } from '../src/utils/code.js'
 
 test('isCode accepts generated codes', () => {
   for (let i = 0; i < 200; i++) assert.ok(isCode(generateCode()))
@@ -38,4 +38,11 @@ test('isAlias menerima alias pendek pilihan manusia', () => {
 test('isAlias menolak yang bisa merusak routing', () => {
   for (const bad of ['', 'IG', '-ig', 'ig/x', 'ig.html', '@ig', 'a'.repeat(33)])
     assert.equal(isAlias(bad), false, bad)
+})
+
+test('isHandle: bentuk handle yang boleh dipakai', () => {
+  for (const ok of ['daniel', 'papuaopensource', 'jerat-papua', 'a1'])
+    assert.ok(isHandle(ok), ok)
+  for (const bad of ['', 'a', 'API', 'app', 'admin', 'a/b', '-x', 'x'.repeat(31)])
+    assert.equal(isHandle(bad), false, bad)
 })
