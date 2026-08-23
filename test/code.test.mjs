@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { isCode, generateCode } from '../src/utils/code.js'
+import { isCode, isAlias, generateCode } from '../src/utils/code.js'
 
 test('isCode accepts generated codes', () => {
   for (let i = 0; i < 200; i++) assert.ok(isCode(generateCode()))
@@ -28,4 +28,14 @@ test('generateCode has the requested length and no bias holes', () => {
   const seen = new Set()
   for (let i = 0; i < 500; i++) seen.add(generateCode())
   assert.ok(seen.size > 490, 'codes should not repeat at this volume')
+})
+
+test('isAlias menerima alias pendek pilihan manusia', () => {
+  for (const ok of ['ig', 'x', 'gh', 'dev-to', 'kastau_muzik', 'a1'])
+    assert.ok(isAlias(ok), ok)
+})
+
+test('isAlias menolak yang bisa merusak routing', () => {
+  for (const bad of ['', 'IG', '-ig', 'ig/x', 'ig.html', '@ig', 'a'.repeat(33)])
+    assert.equal(isAlias(bad), false, bad)
 })

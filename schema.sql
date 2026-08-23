@@ -2,14 +2,19 @@
 -- Idempotent: safe to re-apply to an existing mambruk-db.
 
 -- Short links -----------------------------------------------------------
+-- handle = '' berarti namespace global (/{code}); handle terisi berarti
+-- tautan milik satu halaman bio (/@{handle}/{alias}). Sengaja string kosong,
+-- bukan NULL: di SQLite, UNIQUE tidak mengunci baris ber-NULL.
 CREATE TABLE IF NOT EXISTS links (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  code TEXT UNIQUE NOT NULL,
+  handle TEXT NOT NULL DEFAULT '',
+  code TEXT NOT NULL,
   url TEXT NOT NULL,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  clicks INTEGER DEFAULT 0
+  clicks INTEGER DEFAULT 0,
+  UNIQUE(handle, code)
 );
-CREATE INDEX IF NOT EXISTS idx_links_code ON links(code);
+CREATE INDEX IF NOT EXISTS idx_links_code ON links(handle, code);
 CREATE INDEX IF NOT EXISTS idx_links_created_at ON links(created_at);
 
 -- Bio pages (linktree) --------------------------------------------------
@@ -55,3 +60,13 @@ INSERT INTO page_links (handle, section, label, description, url, icon, position
   ('papuaopensource', 'Media Sosial', 'Ikuti Kami di X (Twitter)', NULL, 'https://x.com/papuaopensource', 'x', 5),
   ('papuaopensource', 'Media Sosial', 'Baca Tulisan Kami di DEV', NULL, 'https://dev.to/papuaopensource', 'article', 6),
   ('papuaopensource', 'Open Source', 'Jelajahi GitHub Kami', NULL, 'https://github.com/papuaopensource', 'github', 7);
+
+-- Seed: alias milik @papuaopensource -------------------------------------
+DELETE FROM links WHERE handle = 'papuaopensource';
+INSERT INTO links (handle, code, url) VALUES
+  ('papuaopensource', 'ig', 'https://instagram.com/papuaopensource'),
+  ('papuaopensource', 'x', 'https://x.com/papuaopensource'),
+  ('papuaopensource', 'gh', 'https://github.com/papuaopensource'),
+  ('papuaopensource', 'dev', 'https://dev.to/papuaopensource'),
+  ('papuaopensource', 'muzik', 'https://kastaumuzik.com'),
+  ('papuaopensource', 'thought', 'https://papuanthought.com');
