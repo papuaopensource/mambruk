@@ -17,10 +17,30 @@ CREATE TABLE IF NOT EXISTS links (
 CREATE INDEX IF NOT EXISTS idx_links_code ON links(handle, code);
 CREATE INDEX IF NOT EXISTS idx_links_created_at ON links(created_at);
 
+-- Akun ------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS users (
+  id TEXT PRIMARY KEY,
+  email TEXT NOT NULL,
+  name TEXT,
+  avatar_url TEXT,
+  provider TEXT NOT NULL,
+  provider_id TEXT NOT NULL,
+  plan TEXT NOT NULL DEFAULT 'free',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(provider, provider_id)
+);
+
+CREATE TABLE IF NOT EXISTS sessions (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  expires_at INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id);
+
 -- Bio pages (linktree) --------------------------------------------------
--- No user_id yet: accounts land with auth (step 3 in .agent/mambruk/saas-plan.md).
 CREATE TABLE IF NOT EXISTS pages (
   handle TEXT PRIMARY KEY,
+  user_id TEXT REFERENCES users(id) ON DELETE CASCADE,
   title TEXT NOT NULL,
   tagline TEXT,
   avatar_url TEXT,

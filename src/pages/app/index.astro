@@ -1,0 +1,179 @@
+---
+import Layout from '../../layouts/Layout.astro'
+import { getUser, PROVIDERS } from '../../utils/auth'
+
+export const prerender = false
+
+const user = await getUser(Astro)
+const db = Astro.locals.runtime?.env?.DB
+
+type Page = { handle: string; title: string; tagline: string | null }
+type Link = { code: string; url: string; clicks: number }
+
+let page: Page | null = null
+let aliases: Link[] = []
+
+if (user && db) {
+  page = await db
+    .prepare('SELECT handle, title, tagline FROM pages WHERE user_id = ?')
+    .bind(user.id)
+    .first<Page>()
+
+  if (page) {
+    const rows = await db
+      .prepare(
+        'SELECT code, url, clicks FROM links WHERE handle = ? ORDER BY code'
+      )
+      .bind(page.handle)
+      .all<Link>()
+    aliases = rows.results ?? []
+  }
+}
+
+const providers = Object.entries(PROVIDERS)
+---
+
+<Layout title="Dashboard — Mambruk">
+  <main class="container mx-auto px-4 py-12 max-w-2xl">
+    {
+      !user ? (
+        <div class="bg-white border border-neutral-800 rounded-xl p-6 sm:p-8 text-center">
+          <h1 class="text-2xl font-bold">Masuk ke Mambruk</h1>
+          <p class="mt-2 text-neutral-600">
+            Masuk untuk mengklaim handle dan membuat tautan pendekmu sendiri.
+          </p>
+          <div class="mt-6 flex flex-col gap-4">
+            {providers.map(([key, provider]) => (
+              <a
+                class="group relative inline-block text-sm font-medium text-neutral-600"
+                href={`/api/auth/${key}`}
+              >
+                <span class="absolute inset-0 translate-x-1.5 translate-y-1.5 bg-neutral-800 rounded" />
+                <span class="relative flex items-center justify-center gap-3 rounded border border-neutral-800 bg-white py-3 group-hover:translate-x-1 group-hover:translate-y-1">
+                  Lanjut dengan {provider.label}
+                </span>
+              </a>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <>
+          <div class="flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+              {user.avatar_url && (
+                <img
+                  src={user.avatar_url}
+                  alt=""
+                  class="w-10 h-10 rounded-full"
+                />
+              )}
+              <div>
+                <p class="font-semibold">{user.name ?? user.email}</p>
+                <p class="text-sm text-neutral-500">{user.email}</p>
+              </div>
+            </div>
+            <form method="POST" action="/api/auth/logout">
+              <button class="text-sm underline text-neutral-600 hover:text-neutral-900">
+                Keluar
+              </button>
+            </form>
+          </div>
+
+          <section class="mt-8 bg-white border border-neutral-800 rounded-xl p-6 sm:p-8">
+            <p class="text-xs font-semibold uppercase tracking-widest text-neutral-400 mb-4">
+              Halaman Bio
+            </p>
+            {page ? (
+              <p>
+                <a class="font-mono underline" href={`/@${page.handle}`}>
+                  /@{page.handle}
+                </a>
+                <span class="text-neutral-600"> — {page.title}</span>
+              </p>
+            ) : (
+              <p class="text-neutral-600">Kamu belum punya halaman.</p>
+            )}
+
+            <form method="POST" action="/api/pages" class="mt-4 flex flex-col gap-3">
+              <input
+                name="handle"
+                value={page?.handle}
+                readonly={!!page}
+                required
+                placeholder="handle (huruf kecil, angka, -)"
+                class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none read-only:bg-neutral-100"
+              />
+              <input
+                name="title"
+                value={page?.title}
+                required
+                placeholder="Judul halaman"
+                class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none"
+              />
+              <input
+                name="tagline"
+                value={page?.tagline ?? ''}
+                placeholder="Tagline (opsional)"
+                class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none"
+              />
+              <button class="px-6 py-3 rounded-lg bg-neutral-800 text-white font-semibold hover:bg-neutral-700">
+                {page ? 'Simpan' : 'Klaim handle'}
+              </button>
+            </form>
+          </section>
+
+          {page && (
+            <section class="mt-6 bg-white border border-neutral-800 rounded-xl p-6 sm:p-8">
+              <p class="text-xs font-semibold uppercase tracking-widest text-neutral-400 mb-4">
+                Tautan Pendek
+              </p>
+
+              {aliases.length === 0 ? (
+                <p class="text-neutral-600">Belum ada alias.</p>
+              ) : (
+                <ul class="flex flex-col gap-2">
+                  {aliases.map((link) => (
+                    <li class="flex items-baseline justify-between gap-3 border-b border-neutral-100 pb-2">
+                      <a
+                        class="font-mono text-sm underline"
+                        href={`/@${page!.handle}/${link.code}`}
+                      >
+                        /@{page!.handle}/{link.code}
+                      </a>
+                      <span class="text-sm text-neutral-500 truncate max-w-[45%]">
+                        {link.url}
+                      </span>
+                      <span class="text-sm text-neutral-400 whitespace-nowrap">
+                        {link.clicks} klik
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              <form method="POST" action="/api/links" class="mt-5 flex flex-col gap-3">
+                <input type="hidden" name="handle" value={page.handle} />
+                <input
+                  name="alias"
+                  required
+                  placeholder="alias, misal: ig"
+                  class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none"
+                />
+                <input
+                  type="url"
+                  name="url"
+                  required
+                  placeholder="https://tujuan.com/..."
+                  class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none"
+                />
+                <button class="px-6 py-3 rounded-lg bg-neutral-800 text-white font-semibold hover:bg-neutral-700">
+                  Simpan alias
+                </button>
+              </form>
+            </section>
+          )}
+        </>
+      )
+    }
+  </main>
+</Layout>

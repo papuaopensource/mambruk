@@ -20,6 +20,41 @@ export function isAlias(value) {
   return typeof value === 'string' && ALIAS_RE.test(value)
 }
 
+// Handle tidak boleh menabrak route statis di root, karena /@handle memang
+// dipisah dengan @ tapi dashboard, API, dan halaman produk hidup di /app,
+// /api, dst. Daftarnya pendek dan sengaja konservatif.
+const RESERVED_HANDLES = new Set([
+  'api',
+  'app',
+  'admin',
+  'login',
+  'logout',
+  'auth',
+  'about',
+  'help',
+  'support',
+  'terms',
+  'privacy',
+  'settings',
+  'dashboard',
+  'mambruk',
+  'me',
+  'new',
+  'static',
+  'assets',
+  'r',
+])
+
+export const HANDLE_RE = /^[a-z0-9][a-z0-9-]{1,29}$/
+
+export function isHandle(value) {
+  return (
+    typeof value === 'string' &&
+    HANDLE_RE.test(value) &&
+    !RESERVED_HANDLES.has(value)
+  )
+}
+
 export function generateCode(length = 6) {
   const bytes = crypto.getRandomValues(new Uint8Array(length))
   let out = ''
