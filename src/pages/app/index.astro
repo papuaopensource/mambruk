@@ -60,8 +60,7 @@ if (user && db) {
 
 const providers = Object.entries(PROVIDERS)
 
-// Nilai yang tampil di pemilih warna: preset halaman ini, sudah ditimpa warna
-// pilihan pemiliknya.
+// What the colour inputs show: this page's preset plus its overrides.
 const colors = resolveTheme(page?.theme ?? 'noir', page?.colors ?? null)
 const TOKEN_LABELS: Record<string, string> = {
   bg: 'Latar halaman',
@@ -127,110 +126,116 @@ const TOKEN_LABELS: Record<string, string> = {
 
             <div class="lg:grid lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-8">
               <div>
-            {page ? (
-              <p>
-                <a class="font-mono underline" href={`/@${page.handle}`}>
-                  /@{page.handle}
-                </a>
-                <span class="text-neutral-600"> — {page.title}</span>
-              </p>
-            ) : (
-              <p class="text-neutral-600">Kamu belum punya halaman.</p>
-            )}
+                {page ? (
+                  <p>
+                    <a class="font-mono underline" href={`/@${page.handle}`}>
+                      /@{page.handle}
+                    </a>
+                    <span class="text-neutral-600"> — {page.title}</span>
+                  </p>
+                ) : (
+                  <p class="text-neutral-600">Kamu belum punya halaman.</p>
+                )}
 
-            <form id="pageForm" method="POST" action="/api/pages" class="mt-4 flex flex-col gap-3">
-              <input
-                name="handle"
-                value={page?.handle}
-                readonly={!!page}
-                required
-                placeholder="handle (huruf kecil, angka, -)"
-                class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none read-only:bg-neutral-100"
-              />
-              <input
-                name="title"
-                value={page?.title}
-                required
-                placeholder="Judul halaman"
-                class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none"
-              />
-              <input
-                name="tagline"
-                value={page?.tagline ?? ''}
-                placeholder="Tagline (opsional)"
-                class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none"
-              />
+                <form
+                  id="pageForm"
+                  method="POST"
+                  action="/api/pages"
+                  class="mt-4 flex flex-col gap-3"
+                >
+                  <input
+                    name="handle"
+                    value={page?.handle}
+                    readonly={!!page}
+                    required
+                    placeholder="handle (huruf kecil, angka, -)"
+                    class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none read-only:bg-neutral-100"
+                  />
+                  <input
+                    name="title"
+                    value={page?.title}
+                    required
+                    placeholder="Judul halaman"
+                    class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none"
+                  />
+                  <input
+                    name="tagline"
+                    value={page?.tagline ?? ''}
+                    placeholder="Tagline (opsional)"
+                    class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none"
+                  />
 
-              <fieldset>
-                <legend class="text-sm font-medium text-neutral-700 mb-2">
-                  Tema
-                </legend>
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  {Object.entries(THEMES).map(([name, theme]) => (
-                    <label class="cursor-pointer">
-                      <input
-                        type="radio"
-                        name="theme"
-                        value={name}
-                        checked={(page?.theme ?? 'noir') === name}
-                        class="peer sr-only"
-                      />
-                      <div class="rounded-lg border-2 border-neutral-200 p-2 transition-colors peer-checked:border-neutral-800 peer-focus-visible:ring-2 peer-focus-visible:ring-neutral-400">
-                        <div
-                          class="aspect-[3/4] rounded flex flex-col items-center justify-center gap-1.5 px-2"
-                          style={`background:${theme.bg}`}
-                        >
-                          <span
-                            class="text-base font-bold leading-none"
-                            style={`color:${theme.fg}`}
-                          >
-                            Aa
-                          </span>
-                          <span
-                            class="w-full h-2.5 rounded-sm"
-                            style={`background:${theme.btn_bg};border:1px solid ${theme.btn_border}`}
+                  <fieldset>
+                    <legend class="text-sm font-medium text-neutral-700 mb-2">
+                      Tema
+                    </legend>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      {Object.entries(THEMES).map(([name, theme]) => (
+                        <label class="cursor-pointer">
+                          <input
+                            type="radio"
+                            name="theme"
+                            value={name}
+                            checked={(page?.theme ?? 'noir') === name}
+                            class="peer sr-only"
                           />
-                          <span
-                            class="w-full h-2.5 rounded-sm"
-                            style={`background:${theme.btn_bg};border:1px solid ${theme.btn_border}`}
+                          <div class="rounded-lg border-2 border-neutral-200 p-2 transition-colors peer-checked:border-neutral-800 peer-focus-visible:ring-2 peer-focus-visible:ring-neutral-400">
+                            <div
+                              class="aspect-[3/4] rounded flex flex-col items-center justify-center gap-1.5 px-2"
+                              style={`background:${theme.bg}`}
+                            >
+                              <span
+                                class="text-base font-bold leading-none"
+                                style={`color:${theme.fg}`}
+                              >
+                                Aa
+                              </span>
+                              <span
+                                class="w-full h-2.5 rounded-sm"
+                                style={`background:${theme.btn_bg};border:1px solid ${theme.btn_border}`}
+                              />
+                              <span
+                                class="w-full h-2.5 rounded-sm"
+                                style={`background:${theme.btn_bg};border:1px solid ${theme.btn_border}`}
+                              />
+                            </div>
+                            <p class="mt-1.5 text-xs text-center text-neutral-600">
+                              {theme.label}
+                            </p>
+                          </div>
+                        </label>
+                      ))}
+                    </div>
+                  </fieldset>
+
+                  <fieldset class="border-2 border-neutral-200 rounded-lg p-4">
+                    <legend class="px-1 text-sm font-medium text-neutral-700">
+                      Warna
+                    </legend>
+                    <p class="text-xs text-neutral-500 mb-3">
+                      Kosongkan saja kalau ingin ikut tema. Warna yang sama
+                      dengan tema tidak disimpan, jadi ganti tema tetap
+                      berpengaruh.
+                    </p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {TOKENS.map((token) => (
+                        <label class="flex items-center justify-between gap-3 text-sm text-neutral-600">
+                          {TOKEN_LABELS[token]}
+                          <input
+                            type="color"
+                            name={token}
+                            value={colors[token]}
+                            class="h-9 w-14 rounded border border-neutral-300 bg-white"
                           />
-                        </div>
-                        <p class="mt-1.5 text-xs text-center text-neutral-600">
-                          {theme.label}
-                        </p>
-                      </div>
-                    </label>
-                  ))}
-                </div>
-              </fieldset>
+                        </label>
+                      ))}
+                    </div>
+                  </fieldset>
 
-              <fieldset class="border-2 border-neutral-200 rounded-lg p-4">
-                <legend class="px-1 text-sm font-medium text-neutral-700">
-                  Warna
-                </legend>
-                <p class="text-xs text-neutral-500 mb-3">
-                  Kosongkan saja kalau ingin ikut tema. Warna yang sama dengan
-                  tema tidak disimpan, jadi ganti tema tetap berpengaruh.
-                </p>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {TOKENS.map((token) => (
-                    <label class="flex items-center justify-between gap-3 text-sm text-neutral-600">
-                      {TOKEN_LABELS[token]}
-                      <input
-                        type="color"
-                        name={token}
-                        value={colors[token]}
-                        class="h-9 w-14 rounded border border-neutral-300 bg-white"
-                      />
-                    </label>
-                  ))}
-                </div>
-              </fieldset>
-
-              <button class="px-6 py-3 rounded-lg bg-neutral-800 text-white font-semibold hover:bg-neutral-700">
-                {page ? 'Simpan' : 'Klaim handle'}
-              </button>
-            </form>
+                  <button class="px-6 py-3 rounded-lg bg-neutral-800 text-white font-semibold hover:bg-neutral-700">
+                    {page ? 'Simpan' : 'Klaim handle'}
+                  </button>
+                </form>
               </div>
 
               {page && (
@@ -256,7 +261,6 @@ const TOKEN_LABELS: Record<string, string> = {
               )}
             </div>
           </section>
-
 
           {page && (
             <section class="mt-6 bg-white border border-neutral-800 rounded-xl p-6 sm:p-8">
@@ -309,9 +313,13 @@ const TOKEN_LABELS: Record<string, string> = {
                           )}
                         </p>
                         {link.description && (
-                          <p class="text-sm text-neutral-500">{link.description}</p>
+                          <p class="text-sm text-neutral-500">
+                            {link.description}
+                          </p>
                         )}
-                        <p class="text-sm text-neutral-400 truncate">{link.url}</p>
+                        <p class="text-sm text-neutral-400 truncate">
+                          {link.url}
+                        </p>
                       </div>
 
                       <form method="POST" action="/api/page-links">
@@ -326,7 +334,11 @@ const TOKEN_LABELS: Record<string, string> = {
                 </ul>
               )}
 
-              <form method="POST" action="/api/page-links" class="mt-5 flex flex-col gap-3">
+              <form
+                method="POST"
+                action="/api/page-links"
+                class="mt-5 flex flex-col gap-3"
+              >
                 <input type="hidden" name="action" value="add" />
                 <input
                   name="label"
@@ -354,11 +366,13 @@ const TOKEN_LABELS: Record<string, string> = {
                     class="flex-1 px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none"
                   />
                   <datalist id="sections">
-                    {[...new Set(pageLinks.map((l) => l.section).filter(Boolean))].map(
-                      (s) => (
-                        <option value={s} />
-                      )
-                    )}
+                    {[
+                      ...new Set(
+                        pageLinks.map((l) => l.section).filter(Boolean)
+                      ),
+                    ].map((s) => (
+                      <option value={s} />
+                    ))}
                   </datalist>
                   <select
                     name="icon"
@@ -406,7 +420,11 @@ const TOKEN_LABELS: Record<string, string> = {
                 </ul>
               )}
 
-              <form method="POST" action="/api/links" class="mt-5 flex flex-col gap-3">
+              <form
+                method="POST"
+                action="/api/links"
+                class="mt-5 flex flex-col gap-3"
+              >
                 <input type="hidden" name="handle" value={page.handle} />
                 <input
                   name="alias"
@@ -440,8 +458,7 @@ const TOKEN_LABELS: Record<string, string> = {
   const frame = document.getElementById('preview') as HTMLIFrameElement | null
 
   if (form && frame) {
-    // Pratinjau satu asal dengan dashboard, jadi variabelnya bisa langsung
-    // disetel ke dokumen di dalamnya — tanpa reload, tanpa postMessage.
+    // Same origin, so the variables can be set on the framed document directly.
     const paint = () => {
       const root = frame.contentDocument?.querySelector('main')
       if (!(root instanceof HTMLElement)) return
@@ -455,9 +472,7 @@ const TOKEN_LABELS: Record<string, string> = {
 
     form.addEventListener('change', (event) => {
       const target = event.target
-      // Memilih tema mengisi ulang seluruh pemilih warna, seperti memulai dari
-      // preset itu. Tanpa ini, warna custom lama menempel dan pilihan tema
-      // seolah tidak berpengaruh.
+      // Picking a theme refills every colour input from that preset.
       if (target instanceof HTMLInputElement && target.name === 'theme') {
         const preset = THEMES[target.value]
         if (preset) {
@@ -470,12 +485,11 @@ const TOKEN_LABELS: Record<string, string> = {
       paint()
     })
 
-    // Pemilih warna memancarkan input saat digeser, change hanya saat selesai.
+    // Colour inputs fire input while dragging, change only at the end.
     form.addEventListener('input', paint)
     frame.addEventListener('load', paint)
 
-    // Sebagian browser memulihkan isian form saat halaman dibuka lagi dari
-    // riwayat; tanpa cat sekali di awal, pratinjau tidak cocok dengan isian.
+    // Some browsers restore form values on back-navigation.
     paint()
   }
 </script>

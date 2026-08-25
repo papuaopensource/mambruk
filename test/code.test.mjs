@@ -30,19 +30,28 @@ test('generateCode has the requested length and no bias holes', () => {
   assert.ok(seen.size > 490, 'codes should not repeat at this volume')
 })
 
-test('isAlias menerima alias pendek pilihan manusia', () => {
+test('isAlias accepts short human-picked aliases', () => {
   for (const ok of ['ig', 'x', 'gh', 'dev-to', 'kastau_muzik', 'a1'])
     assert.ok(isAlias(ok), ok)
 })
 
-test('isAlias menolak yang bisa merusak routing', () => {
+test('isAlias rejects anything that would break routing', () => {
   for (const bad of ['', 'IG', '-ig', 'ig/x', 'ig.html', '@ig', 'a'.repeat(33)])
     assert.equal(isAlias(bad), false, bad)
 })
 
-test('isHandle: bentuk handle yang boleh dipakai', () => {
+test('isHandle accepts valid handles and rejects reserved ones', () => {
   for (const ok of ['daniel', 'papuaopensource', 'jerat-papua', 'a1'])
     assert.ok(isHandle(ok), ok)
-  for (const bad of ['', 'a', 'API', 'app', 'admin', 'a/b', '-x', 'x'.repeat(31)])
+  for (const bad of [
+    '',
+    'a',
+    'API',
+    'app',
+    'admin',
+    'a/b',
+    '-x',
+    'x'.repeat(31),
+  ])
     assert.equal(isHandle(bad), false, bad)
 })

@@ -117,15 +117,21 @@ const user = await getUser(Astro)
       <p class="mt-4 text-sm text-neutral-500">
         {
           user ? (
-            <a class="underline underline-offset-4 hover:text-neutral-800" href="/app">
+            <a
+              class="underline underline-offset-4 hover:text-neutral-800"
+              href="/app"
+            >
               Kelola halamanmu di dashboard
             </a>
           ) : (
             <>
-              <a class="underline underline-offset-4 hover:text-neutral-800" href="/app">
+              <a
+                class="underline underline-offset-4 hover:text-neutral-800"
+                href="/app"
+              >
                 Masuk
-              </a>
-              {' '}dengan GitHub atau Google untuk bikin halamanmu sendiri.
+              </a>{' '}
+              dengan GitHub atau Google untuk bikin halamanmu sendiri.
             </>
           )
         }
@@ -171,12 +177,14 @@ const user = await getUser(Astro)
         body: JSON.stringify({ url }),
       })
       const data = await response.json()
-      if (!response.ok) throw new Error(data.error || 'Gagal memendekkan URL')
+      if (!response.ok)
+        throw new Error(data.error || 'Could not shorten that URL')
 
       shortUrlInput.value = `${window.location.origin}/${data.code}`
       result.classList.remove('hidden')
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Terjadi kesalahan'
+      const message =
+        err instanceof Error ? err.message : 'Something went wrong'
       error.querySelector('p')!.textContent = message
       error.classList.remove('hidden')
     } finally {

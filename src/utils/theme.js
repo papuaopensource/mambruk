@@ -1,19 +1,17 @@
-// Tema halaman bio: sekumpulan token warna yang dirender jadi CSS variable.
-// Modelnya meniru treelink (github.com/trevortylerlee/treelink), tapi di sana
-// variabelnya ditulis sekali di global.css saat build. Di sini tema berbeda
-// per halaman dan dibaca dari database, jadi tokennya dipadatkan ke tujuh yang
-// benar-benar dipakai desain ini.
+// Bio page themes: colour tokens rendered as CSS variables. Token model from
+// treelink (github.com/trevortylerlee/treelink), trimmed to what this design uses.
 
 export const TOKENS = [
-  'bg', // latar halaman
-  'surface', // latar kartu
-  'fg', // teks utama
-  'muted', // teks sekunder
-  'btn_bg', // latar tombol
-  'btn_fg', // teks tombol
-  'btn_border', // garis tombol sekaligus bayangannya
+  'bg', // Background
+  'surface', // Card
+  'fg', // Primary text
+  'muted', // Secondary text
+  'btn_bg', // Button background
+  'btn_fg', // Button text
+  'btn_border', // Button border and shadow
 ]
 
+// Preset themes
 export const THEMES = {
   noir: {
     label: 'Noir',
@@ -109,18 +107,14 @@ export const THEMES = {
 
 export const THEME_NAMES = Object.keys(THEMES)
 
-// Hanya #rrggbb. Nilai warna ditulis apa adanya ke atribut style, jadi tanpa
-// pemeriksaan ini satu nilai seperti "red;background-image:url(...)" cukup
-// untuk menyuntikkan CSS ke halaman orang.
+// #rrggbb only. Values go straight into a style attribute.
 export const HEX_RE = /^#[0-9a-f]{6}$/
 
 export function isHexColor(value) {
   return typeof value === 'string' && HEX_RE.test(value.toLowerCase())
 }
 
-// Ambil preset, lalu timpa dengan warna pilihan pemilik halaman. Nilai yang
-// tidak lolos pemeriksaan dibuang diam-diam supaya halaman tetap terbaca,
-// bukan gagal render.
+// Preset merged with the owner's overrides. Invalid values are dropped.
 export function resolveTheme(themeName, overridesJson) {
   const base = THEMES[themeName] ?? THEMES.noir
   const colors = {}
@@ -145,13 +139,12 @@ export function resolveTheme(themeName, overridesJson) {
   return colors
 }
 
-// Dipakai sebagai atribut style pada pembungkus halaman.
+// Style attribute for the page wrapper.
 export function themeStyle(colors) {
   return TOKENS.map((token) => `--mb-${token}: ${colors[token]}`).join('; ')
 }
 
-// Menyaring masukan form jadi JSON yang boleh disimpan, atau null kalau tidak
-// ada yang berbeda dari presetnya.
+// Form input to JSON, or null when nothing differs from the preset.
 export function pickOverrides(themeName, input) {
   const base = THEMES[themeName] ?? THEMES.noir
   const kept = {}
