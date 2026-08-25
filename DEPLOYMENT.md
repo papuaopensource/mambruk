@@ -233,6 +233,36 @@ pnpm dlx wrangler d1 execute mambruk-db --remote --command="SELECT * FROM links"
 
 ---
 
+## Jebakan: binding hilang di produksi
+
+Gejalanya: deploy sukses, landing dan `/app` terbuka normal, tapi setiap route
+yang menyentuh database balas 503 atau 404 — `/@handle` jadi 404, `/api/shorten`
+jadi `Service temporarily unavailable`.
+
+Sebabnya hampir selalu sama: **environment di wrangler tidak mewarisi binding
+dari level atas.** Begitu `wrangler.toml` punya blok `[env.production]` —
+sekadar untuk satu `vars` sekalipun — deploy ke branch produksi hanya memakai
+isi blok itu. `[[d1_databases]]` dan `[[kv_namespaces]]` di level atas
+diabaikan, tanpa peringatan apa pun saat deploy.
+
+Periksa apa yang benar-benar terpasang, bukan apa yang tertulis di repo:
+
+```bash
+mkdir /tmp/cek && cd /tmp/cek
+pnpm dlx wrangler pages download config mambruk
+cat wrangler.toml
+```
+
+(Jalankan di folder kosong — perintah ini menimpa `wrangler.toml` di folder
+tempat ia dijalankan.)
+
+Kalau blok binding-nya tidak muncul di situ, pilih salah satu: hapus semua
+blok `[env.*]` sehingga level atas berlaku untuk semua environment, atau salin
+**seluruh** binding ke dalam setiap blok environment. Proyek ini memilih yang
+pertama.
+
+---
+
 ## Log dan rollback
 
 ```bash
