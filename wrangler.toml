@@ -2,25 +2,20 @@ name = "mambruk"
 compatibility_date = "2026-08-01"
 pages_build_output_dir = "dist"
 
-# D1 Database binding.
-# database_id diisi dari keluaran `wrangler d1 create mambruk-db` — lihat
-# DEPLOYMENT.md langkah 2. Sengaja dibiarkan placeholder, bukan id lama:
-# id dari akun lain gagal dengan pesan yang membingungkan.
+# D1 Database
 [[d1_databases]]
 binding = "DB"
 database_name = "mambruk-db"
 database_id = "ba289505-9c7b-4841-84ee-9ef933dd168d"
 
-# KV untuk rate limiting — DEPLOYMENT.md langkah 3.
-# Selama id-nya masih placeholder, rate limiting mati total: checkLimit
-# meloloskan semua permintaan saat binding-nya tidak ada.
+# KV for rate limiting
 [[kv_namespaces]]
 binding = "RATE_LIMITER"
 id = "9a7e26a046a646aea606c49ffc6713c4"
 preview_id = "8754454a92384e2c9b3634443675bb84"
 
-[env.production.vars]
-NODE_ENV = "production"
-
-[env.preview.vars]
-NODE_ENV = "preview"
+# Sengaja tanpa blok [env.*]: environment di wrangler TIDAK mewarisi binding
+# dari level atas. Begitu [env.production] ada, deploy ke branch produksi
+# hanya memakai isi blok itu, dan D1/KV di atas diabaikan tanpa peringatan —
+# gejalanya 503 di setiap route yang menyentuh database.
+# Kalau nanti perlu env terpisah, salin SEMUA binding ke tiap blok.
