@@ -83,20 +83,38 @@ export const GET: APIRoute = async (context) => {
     return context.redirect('/?error=state_mismatch', 302)
   }
 
+  // application/x-www-form-urlencoded, bukan JSON: Google menolak badan JSON
+  // di endpoint token, dan GitHub menerima keduanya. Satu bentuk untuk dua
+  // provider lebih sedikit yang bisa salah.
   const tokenResponse = await fetch(PROVIDERS[provider].token, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-    body: JSON.stringify({
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      Accept: 'application/json',
+      'User-Agent': 'mambruk',
+    },
+    body: new URLSearchParams({
       client_id: creds.id,
       client_secret: creds.secret,
       code,
       redirect_uri: `${context.url.origin}/api/auth/callback/${provider}`,
       grant_type: 'authorization_code',
     }),
-  }).then((r) => (r.ok ? r.json<any>() : null))
+  })
 
-  const accessToken = tokenResponse?.access_token
-  if (!accessToken) return context.redirect('/?error=token_exchange', 302)
+  const payload = await tokenResponse.json<any>().catch(() => null)
+  const accessToken = payload?.access_token
+  if (!accessToken) {
+    // Tanpa baris ini kegagalannya cuma tampak sebagai ?error=token_exchange
+    // di URL, dan penyebab sebenarnya — kredensial salah, kode kedaluwarsa,
+    // redirect_uri beda — tidak terlihat di mana pun.
+    console.error(
+      `Token exchange ${provider} gagal: status=${tokenResponse.status}`,
+      `error=${payload?.error}`,
+      `description=${payload?.error_description}`
+    )
+    return context.redirect('/?error=token_exchange', 302)
+  }
 
   const profile = await fetchProfile(provider, accessToken)
   if (!profile) return context.redirect('/?error=no_verified_email', 302)
