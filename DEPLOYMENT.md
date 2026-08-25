@@ -90,10 +90,15 @@ preview_id = "<id preview>"
 ## 4. Buat project Pages
 
 ```bash
-pnpm dlx wrangler pages project create mambruk --production-branch master
+pnpm dlx wrangler pages project create mambruk --production-branch staging
 ```
 
 Sekali saja per akun. Cek dengan `pnpm dlx wrangler pages project list`.
+
+Nama project bisa bentrok secara global, dan Cloudflare menambahkan sufiks
+tanpa memberi tahu di kemudian hari. Project ini terbit di
+**`https://mambruk-ckd.pages.dev`**, bukan `mambruk.pages.dev` — pakai URL dari
+keluaran perintahnya, jangan menebak dari nama project.
 
 ---
 
@@ -137,13 +142,13 @@ pnpm build
 pnpm dlx wrangler pages deploy dist --project-name mambruk
 ```
 
-Keluarannya memberi URL `https://<hash>.mambruk.pages.dev`, dan alamat tetap
-`https://mambruk.pages.dev` untuk branch produksi.
+Keluarannya memberi URL `https://<hash>.mambruk-ckd.pages.dev`, dan alamat tetap
+`https://mambruk-ckd.pages.dev` untuk branch produksi (di sini: `staging`).
 
 Deploy preview dari branch lain:
 
 ```bash
-pnpm dlx wrangler pages deploy dist --project-name mambruk --branch feat/add-auth
+pnpm dlx wrangler pages deploy dist --project-name mambruk --branch feat/add-bio-editor
 ```
 
 ---
@@ -170,8 +175,8 @@ bisa dipakai di produksi kecuali URL-nya ditambahkan.
 
 | Provider | Tambahkan redirect URI |
 |---|---|
-| GitHub | `https://mambruk.pages.dev/api/auth/callback/github` |
-| Google | `https://mambruk.pages.dev/api/auth/callback/google` |
+| GitHub | `https://mambruk-ckd.pages.dev/api/auth/callback/github` |
+| Google | `https://mambruk-ckd.pages.dev/api/auth/callback/google` |
 
 Ganti host-nya kalau sudah pakai domain sendiri. Praktik yang lebih rapi: satu
 OAuth App untuk lokal, satu lagi untuk produksi, supaya secret produksi tidak
@@ -196,7 +201,7 @@ perbarui redirect URI OAuth serta tag `og:url` / `og:image` ke host baru.
 ## Pengembangan lokal
 
 ```bash
-cp .dev.vars.example .dev.vars     # isi AUTH_SECRET dan kredensial OAuth
+cp .env.example .env               # isi AUTH_SECRET dan kredensial OAuth
 pnpm dlx wrangler d1 execute mambruk-db --local --file=./schema.sql
 pnpm dev                            # http://localhost:4321
 ```
@@ -206,9 +211,11 @@ pnpm dev                            # http://localhost:4321
 
 Dua hal yang memakan waktu kalau tidak tahu:
 
-- **`.dev.vars` dibaca sekali saat server start.** Mengeditnya selagi server
-  hidup tidak berefek, dan gejalanya menyesatkan: semua sesi gagal diam-diam
-  seolah cookie-nya rusak. Restart setiap habis menyentuh file itu.
+- **`.env` dibaca sekali saat server start.** Mengeditnya selagi server hidup
+  tidak berefek, dan gejalanya menyesatkan: semua sesi gagal diam-diam seolah
+  cookie-nya rusak. Restart setiap habis menyentuh file itu. (Wrangler juga
+  masih menerima `.dev.vars`; proyek ini memilih `.env` saja agar tidak ada
+  dua tempat rahasia.)
 - **Buka lewat `localhost`, jangan `127.0.0.1`.** `redirect_uri` dibentuk dari
   origin yang dipakai browser, dan yang terdaftar di OAuth App adalah
   `localhost`. Beda host berarti *redirect_uri mismatch*.

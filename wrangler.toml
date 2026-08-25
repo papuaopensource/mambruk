@@ -9,15 +9,15 @@ pages_build_output_dir = "dist"
 [[d1_databases]]
 binding = "DB"
 database_name = "mambruk-db"
-database_id = "ISI_DARI_wrangler_d1_create"
+database_id = "ba289505-9c7b-4841-84ee-9ef933dd168d"
 
 # KV untuk rate limiting — DEPLOYMENT.md langkah 3.
 # Selama id-nya masih placeholder, rate limiting mati total: checkLimit
 # meloloskan semua permintaan saat binding-nya tidak ada.
 [[kv_namespaces]]
 binding = "RATE_LIMITER"
-id = "ISI_DARI_wrangler_kv_namespace_create"
-preview_id = "ISI_DARI_wrangler_kv_namespace_create_preview"
+id = "9a7e26a046a646aea606c49ffc6713c4"
+preview_id = "8754454a92384e2c9b3634443675bb84"
 
 [env.production.vars]
 NODE_ENV = "production"
