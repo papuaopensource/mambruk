@@ -45,6 +45,7 @@ CREATE TABLE IF NOT EXISTS pages (
   tagline TEXT,
   avatar_url TEXT,
   theme TEXT NOT NULL DEFAULT 'brutal',
+  colors TEXT,
   published INTEGER NOT NULL DEFAULT 1,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );

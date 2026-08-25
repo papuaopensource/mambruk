@@ -2,13 +2,20 @@
 import Layout from '../../layouts/Layout.astro'
 import { getUser, PROVIDERS } from '../../utils/auth'
 import { ICON_NAMES } from '../../utils/icons.js'
+import { THEMES, TOKENS, resolveTheme } from '../../utils/theme.js'
 
 export const prerender = false
 
 const user = await getUser(Astro)
 const db = Astro.locals.runtime?.env?.DB
 
-type Page = { handle: string; title: string; tagline: string | null }
+type Page = {
+  handle: string
+  title: string
+  tagline: string | null
+  theme: string
+  colors: string | null
+}
 type Link = { code: string; url: string; clicks: number }
 type PageLink = {
   id: number
@@ -25,7 +32,9 @@ let pageLinks: PageLink[] = []
 
 if (user && db) {
   page = await db
-    .prepare('SELECT handle, title, tagline FROM pages WHERE user_id = ?')
+    .prepare(
+      'SELECT handle, title, tagline, theme, colors FROM pages WHERE user_id = ?'
+    )
     .bind(user.id)
     .first<Page>()
 
@@ -50,6 +59,19 @@ if (user && db) {
 }
 
 const providers = Object.entries(PROVIDERS)
+
+// Nilai yang tampil di pemilih warna: preset halaman ini, sudah ditimpa warna
+// pilihan pemiliknya.
+const colors = resolveTheme(page?.theme ?? 'brutal', page?.colors ?? null)
+const TOKEN_LABELS: Record<string, string> = {
+  bg: 'Latar halaman',
+  surface: 'Latar kartu',
+  fg: 'Teks utama',
+  muted: 'Teks sekunder',
+  btn_bg: 'Latar tombol',
+  btn_fg: 'Teks tombol',
+  btn_border: 'Garis & bayangan tombol',
+}
 ---
 
 <Layout title="Dashboard — Mambruk">
@@ -135,6 +157,44 @@ const providers = Object.entries(PROVIDERS)
                 placeholder="Tagline (opsional)"
                 class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none"
               />
+
+              <label class="text-sm font-medium text-neutral-700">
+                Tema
+                <select
+                  name="theme"
+                  class="mt-1 w-full px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none"
+                >
+                  {Object.entries(THEMES).map(([name, theme]) => (
+                    <option value={name} selected={(page?.theme ?? 'brutal') === name}>
+                      {theme.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <fieldset class="border-2 border-neutral-200 rounded-lg p-4">
+                <legend class="px-1 text-sm font-medium text-neutral-700">
+                  Warna
+                </legend>
+                <p class="text-xs text-neutral-500 mb-3">
+                  Kosongkan saja kalau ingin ikut tema. Warna yang sama dengan
+                  tema tidak disimpan, jadi ganti tema tetap berpengaruh.
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {TOKENS.map((token) => (
+                    <label class="flex items-center justify-between gap-3 text-sm text-neutral-600">
+                      {TOKEN_LABELS[token]}
+                      <input
+                        type="color"
+                        name={token}
+                        value={colors[token]}
+                        class="h-9 w-14 rounded border border-neutral-300 bg-white"
+                      />
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+
               <button class="px-6 py-3 rounded-lg bg-neutral-800 text-white font-semibold hover:bg-neutral-700">
                 {page ? 'Simpan' : 'Klaim handle'}
               </button>
