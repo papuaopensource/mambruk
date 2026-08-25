@@ -3,21 +3,19 @@ import { getUser } from '../../utils/auth'
 import { URLValidator } from '../../utils/urlValidator'
 import { ICON_NAMES } from '../../utils/icons.js'
 
-// Editor tautan halaman bio. Handle tidak diambil dari form: selalu dari
-// halaman milik pengguna yang sedang masuk, supaya tidak ada parameter yang
-// bisa dipakai menyunting halaman orang lain.
+// Bio page link editor. The handle comes from the session, never from the form.
 export const POST: APIRoute = async (context) => {
   const db = context.locals.runtime?.env?.DB
-  if (!db) return json({ error: 'Layanan sedang tidak tersedia' }, 503)
+  if (!db) return json({ error: 'Service unavailable' }, 503)
 
   const user = await getUser(context)
-  if (!user) return json({ error: 'Silakan masuk dulu' }, 401)
+  if (!user) return json({ error: 'Sign in first' }, 401)
 
   const page = await db
     .prepare('SELECT handle FROM pages WHERE user_id = ?')
     .bind(user.id)
     .first<{ handle: string }>()
-  if (!page) return json({ error: 'Klaim handle dulu' }, 400)
+  if (!page) return json({ error: 'Claim a handle first' }, 400)
 
   const form = await context.request.formData()
   const action = String(form.get('action') ?? '')
@@ -29,14 +27,14 @@ export const POST: APIRoute = async (context) => {
     const description = String(form.get('description') ?? '').trim()
     const icon = String(form.get('icon') ?? '').trim()
 
-    if (!label) return json({ error: 'Label wajib diisi' }, 400)
+    if (!label) return json({ error: 'Label is required' }, 400)
 
     const validation = URLValidator.validate(url)
     if (!validation.isValid) {
-      return json({ error: `URL tidak valid: ${validation.reason}` }, 400)
+      return json({ error: `Invalid URL: ${validation.reason}` }, 400)
     }
     if (icon && !ICON_NAMES.includes(icon)) {
-      return json({ error: 'Ikon tidak dikenal' }, 400)
+      return json({ error: 'Unknown icon' }, 400)
     }
 
     const last = await db
@@ -64,32 +62,32 @@ export const POST: APIRoute = async (context) => {
   }
 
   const id = Number(form.get('id'))
-  if (!Number.isInteger(id)) return json({ error: 'Tautan tidak dikenal' }, 400)
+  if (!Number.isInteger(id)) return json({ error: 'Unknown link' }, 400)
 
-  // Setiap perubahan menyertakan handle pemilik di WHERE-nya: id saja tidak
-  // cukup, karena id itu tebakan yang mudah.
+  // Every write carries the owner's handle in its WHERE: ids are guessable.
   if (action === 'delete') {
     const result = await db
       .prepare('DELETE FROM page_links WHERE id = ? AND handle = ?')
       .bind(id, page.handle)
       .run()
-    // Tidak ada baris yang terhapus berarti id itu bukan milik pengguna ini.
-    // Balas 404, jangan 302 seolah berhasil: sukses palsu menyembunyikan bug.
-    if (!result.meta.changes) return json({ error: 'Tautan tidak dikenal' }, 404)
+    // Nothing deleted means the id belongs to someone else.
+    if (!result.meta.changes) return json({ error: 'Unknown link' }, 404)
     return context.redirect('/app', 302)
   }
 
   if (action === 'move') {
     const direction = String(form.get('direction') ?? '')
     if (direction !== 'up' && direction !== 'down') {
-      return json({ error: 'Arah tidak dikenal' }, 400)
+      return json({ error: 'Unknown direction' }, 400)
     }
 
     const current = await db
-      .prepare('SELECT id, position FROM page_links WHERE id = ? AND handle = ?')
+      .prepare(
+        'SELECT id, position FROM page_links WHERE id = ? AND handle = ?'
+      )
       .bind(id, page.handle)
       .first<{ id: number; position: number }>()
-    if (!current) return json({ error: 'Tautan tidak dikenal' }, 404)
+    if (!current) return json({ error: 'Unknown link' }, 404)
 
     const neighbour = await db
       .prepare(
@@ -102,7 +100,7 @@ export const POST: APIRoute = async (context) => {
       .bind(page.handle, current.position)
       .first<{ id: number; position: number }>()
 
-    // Sudah di ujung: bukan error, tidak ada yang perlu ditukar.
+    // Already at the end, nothing to swap.
     if (neighbour) {
       await db.batch([
         db
@@ -116,7 +114,7 @@ export const POST: APIRoute = async (context) => {
     return context.redirect('/app', 302)
   }
 
-  return json({ error: 'Aksi tidak dikenal' }, 400)
+  return json({ error: 'Unknown action' }, 400)
 }
 
 function json(body: unknown, status: number) {

@@ -27,9 +27,7 @@ const BLACKLISTED_DOMAINS = new Set([
   '0.0.0.0',
 ])
 
-// Raw IPv4 host, e.g. http://203.0.113.10/ — checked against the hostname
-// only. The old version tested this against the whole URL, which rejected any
-// link containing a dotted version number.
+// Matched against the hostname only, not the whole URL.
 const IPV4_HOSTNAME = /^[0-9]{1,3}(\.[0-9]{1,3}){3}$/
 
 // Suspicious URL patterns
@@ -247,4 +245,9 @@ export class URLValidator {
 }
 
 // Export for easy access
-export { BLACKLISTED_DOMAINS, SUSPICIOUS_PATTERNS, BLOCKED_EXTENSIONS, IPV4_HOSTNAME }
+export {
+  BLACKLISTED_DOMAINS,
+  SUSPICIOUS_PATTERNS,
+  BLOCKED_EXTENSIONS,
+  IPV4_HOSTNAME,
+}

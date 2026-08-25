@@ -1,111 +1,59 @@
 # Deployment
 
-Cara menerbitkan Mambruk ke Cloudflare: Pages (runtime Workers), D1 sebagai
-database, dan KV untuk rate limiting. Semua lewat `wrangler`, tanpa klik-klik
-di dashboard.
+Mambruk runs on Cloudflare Pages with D1 for data and KV for rate limiting.
+Everything below is `wrangler` from the repo root. Wrangler is a devDependency,
+so `pnpm dlx wrangler` uses the pinned version.
 
-Perintah di bawah dijalankan dari root repo ini. Wrangler sudah ada di
-`devDependencies`, jadi `pnpm dlx wrangler` memakai versi yang terkunci di
-`pnpm-lock.yaml` — tidak perlu install global.
-
----
-
-## 1. Login dan pastikan akunnya benar
+## 1. Log in
 
 ```bash
-pnpm dlx wrangler login      # buka browser, lalu izinkan
+pnpm dlx wrangler login
 pnpm dlx wrangler whoami
 ```
 
-`whoami` menampilkan Account Name dan Account ID. **Cocokkan dulu sebelum
-lanjut.** Kalau pernah login dengan akun lain, kredensialnya menempel di
-`~/.config/.wrangler/config/default.toml`; `wrangler logout` lalu login ulang
-kalau yang muncul akun yang salah.
+Check the account name before going further. Credentials live in
+`~/.config/.wrangler/config/default.toml`; `wrangler logout` switches accounts.
 
-Sumber kesalahan paling sering saat pindah akun: id resource di
-`wrangler.toml` masih milik akun lama. Id itu tetap terlihat valid secara
-bentuk, tapi tidak ditemukan di akun baru, dan pesan errornya tidak menyebut
-soal akun sama sekali.
+Resource ids in `wrangler.toml` belong to one account. After switching, an id
+from the old account still looks valid but is not found, and the error says
+nothing about accounts.
 
----
-
-## 2. Buat database D1
+## 2. D1 database
 
 ```bash
 pnpm dlx wrangler d1 create mambruk-db
 ```
 
-Keluarannya memuat `database_id`. Salin ke `wrangler.toml`:
-
-```toml
-[[d1_databases]]
-binding = "DB"
-database_name = "mambruk-db"
-database_id = "<tempel di sini>"
-```
-
-Cek kapan saja dengan `pnpm dlx wrangler d1 list` atau
-`pnpm dlx wrangler d1 info mambruk-db`.
-
-### Terapkan skema
+Copy `database_id` from the output into `wrangler.toml`. Then apply the schema:
 
 ```bash
 pnpm dlx wrangler d1 execute mambruk-db --remote --file=./schema.sql
 ```
 
-`schema.sql` memakai `CREATE TABLE IF NOT EXISTS`, jadi aman dijalankan ulang
-pada database yang sudah ada.
+`schema.sql` uses `CREATE TABLE IF NOT EXISTS`, so re-running it is safe — and
+for the same reason it will not add a column to a table that already exists.
+Existing databases take the files in `migrations/` instead.
 
-> **Jebakan:** justru karena `IF NOT EXISTS`, file ini **tidak** mengubah tabel
-> yang sudah terlanjur ada. Menambah kolom di `schema.sql` lalu menjalankannya
-> ulang tidak berefek apa-apa, dan aplikasi baru gagal saat query menyentuh
-> kolom yang tidak pernah dibuat. Untuk database yang sudah berisi data,
-> pakai file di `migrations/` (lihat langkah 7).
-
----
-
-## 3. Buat KV untuk rate limiting
+## 3. KV for rate limiting
 
 ```bash
 pnpm dlx wrangler kv namespace create RATE_LIMITER
 pnpm dlx wrangler kv namespace create RATE_LIMITER --preview
 ```
 
-Salin kedua id ke `wrangler.toml`:
+Copy both ids into `wrangler.toml`. While they are placeholders, `checkLimit`
+sees no binding and lets every request through.
 
-```toml
-[[kv_namespaces]]
-binding = "RATE_LIMITER"
-id = "<id produksi>"
-preview_id = "<id preview>"
-```
-
-> Selama id-nya masih placeholder, **rate limiting mati total** — bukan error,
-> tapi diam-diam meloloskan semua permintaan. `RateLimiter.checkLimit` memang
-> dirancang begitu supaya `pnpm dev` tetap jalan tanpa KV. Jangan terbitkan ke
-> publik dalam keadaan ini.
-
----
-
-## 4. Buat project Pages
+## 4. Pages project
 
 ```bash
 pnpm dlx wrangler pages project create mambruk --production-branch staging
 ```
 
-Sekali saja per akun. Cek dengan `pnpm dlx wrangler pages project list`.
+Project names are globally unique and Cloudflare appends a suffix when taken.
+This one lives at `https://mambruk-ckd.pages.dev`. Use the URL from the output.
 
-Nama project bisa bentrok secara global, dan Cloudflare menambahkan sufiks
-tanpa memberi tahu di kemudian hari. Project ini terbit di
-**`https://mambruk-ckd.pages.dev`**, bukan `mambruk.pages.dev` — pakai URL dari
-keluaran perintahnya, jangan menebak dari nama project.
-
----
-
-## 5. Isi secret
-
-Aplikasi menolak jalan tanpa `AUTH_SECRET`, dan tombol login menolak jalan
-tanpa kredensial OAuth.
+## 5. Secrets
 
 ```bash
 pnpm dlx wrangler pages secret put AUTH_SECRET --project-name mambruk
@@ -115,190 +63,147 @@ pnpm dlx wrangler pages secret put GOOGLE_CLIENT_ID --project-name mambruk
 pnpm dlx wrangler pages secret put GOOGLE_CLIENT_SECRET --project-name mambruk
 ```
 
-Perintahnya menanyakan nilainya secara interaktif. **Jangan** menaruh nilai
-rahasia sebagai argumen atau lewat `echo ... |` — keduanya tersimpan di riwayat
-shell.
+Values are prompted for. Don't pass them as arguments or pipe them from `echo`;
+both end up in shell history.
 
-`AUTH_SECRET` minimal 32 karakter, dan **berbeda** dari yang di `.dev.vars`:
+`AUTH_SECRET` needs 32+ characters and should differ from the one in `.env`:
 
 ```bash
 openssl rand -hex 32
 ```
 
-Kalau `AUTH_SECRET` diganti, semua sesi yang sedang berjalan langsung tidak
-valid dan semua orang terlempar ke halaman login. Itu perilaku yang benar, dan
-juga cara mencabut semua sesi kalau ada kebocoran.
+Changing it invalidates every session, which is also how you revoke them all.
 
-Daftar secret yang sudah ada: `pnpm dlx wrangler pages secret list --project-name mambruk`.
+Pages binds variables when a deployment is created, so a new secret does
+nothing until the next deploy.
 
-> **Secret baru tidak berlaku sampai ada deployment baru.** Pages mengikat
-> variabel saat deployment dibuat, jadi `secret put` pada deployment yang sudah
-> berjalan tidak mengubah apa pun. Selalu `pages deploy` lagi sesudahnya —
-> kalau tidak, errornya persis sama dan mudah dikira secret-nya masih salah.
+List what is set with `pnpm dlx wrangler pages secret list --project-name mambruk`.
 
-### Kalau login gagal dengan `?error=token_exchange`
-
-Baca sebabnya dari log, jangan menebak:
-
-```bash
-pnpm dlx wrangler pages deployment tail --project-name mambruk
-```
-
-`incorrect_client_credentials` berarti `GITHUB_CLIENT_SECRET` di Pages tidak
-cocok dengan `GITHUB_CLIENT_ID`-nya. GitHub hanya menampilkan client secret
-sekali; menekan **Generate a new client secret** membuat yang lama langsung
-mati, termasuk yang ada di `.env` lokal.
-
----
-
-## 6. Build dan deploy
+## 6. Build and deploy
 
 ```bash
 pnpm install
 pnpm test
 pnpm build
-pnpm dlx wrangler pages deploy dist --project-name mambruk
+pnpm dlx wrangler pages deploy dist --project-name mambruk --branch staging
 ```
 
-Keluarannya memberi URL `https://<hash>.mambruk-ckd.pages.dev`, dan alamat tetap
-`https://mambruk-ckd.pages.dev` untuk branch produksi (di sini: `staging`).
+`pages deploy` uploads the local `dist/` as-is. It does not build and it does
+not read git, so `pnpm build` first. `--branch` is a label: matching the
+production branch makes it the production deployment, anything else becomes a
+preview with its own URL.
 
-Deploy preview dari branch lain:
+`pages deployment list` shows a Source column with the commit wrangler picked
+up from the working tree — the quickest way to see what is actually live.
 
-```bash
-pnpm dlx wrangler pages deploy dist --project-name mambruk --branch feat/add-bio-editor
-```
+## 7. Migrations
 
----
-
-## 7. Migrasi database yang sudah berisi data
-
-`migrations/0001_links_handle.sql` membangun ulang tabel `links` supaya
-keunikannya per pemilik (`UNIQUE(handle, code)`), bukan global. Hanya perlu
-dijalankan pada database yang tabel `links`-nya dibuat sebelum fitur alias
-per-handle ada. Database yang baru dibuat lewat langkah 2 **tidak** perlu ini.
+Files in `migrations/` are one-offs for databases that already exist. A fresh
+database created in step 2 needs none of them.
 
 ```bash
-# selalu backup dulu — perintah ini menghapus dan membangun ulang tabel
 pnpm dlx wrangler d1 export mambruk-db --remote --output backup.sql
 pnpm dlx wrangler d1 execute mambruk-db --remote --file=./migrations/0001_links_handle.sql
 ```
 
----
+`0001` rebuilds `links` so uniqueness is per owner. `0002` adds `pages.colors`.
 
-## 8. OAuth untuk produksi
+## 8. OAuth in production
 
-Callback URL terikat ke origin. OAuth App yang dipakai di `localhost` **tidak**
-bisa dipakai di produksi kecuali URL-nya ditambahkan.
+Callback URLs are tied to the origin, so a localhost app will not work in
+production until its URL is added.
 
-| Provider | Tambahkan redirect URI |
-|---|---|
-| GitHub | `https://mambruk-ckd.pages.dev/api/auth/callback/github` |
-| Google | `https://mambruk-ckd.pages.dev/api/auth/callback/google` |
+| Provider | Redirect URI                                             |
+| -------- | -------------------------------------------------------- |
+| GitHub   | `https://mambruk-ckd.pages.dev/api/auth/callback/github` |
+| Google   | `https://mambruk-ckd.pages.dev/api/auth/callback/google` |
 
-Ganti host-nya kalau sudah pakai domain sendiri. Praktik yang lebih rapi: satu
-OAuth App untuk lokal, satu lagi untuk produksi, supaya secret produksi tidak
-pernah ada di laptop.
+Add them alongside the localhost ones rather than replacing them. Separate apps
+for local and production keep production secrets off the laptop.
 
----
+## 9. Custom domain
 
-## 9. Domain sendiri
+`wrangler pages` has no domain command. Use the dashboard:
 
-Domain kustom Pages **tidak ada perintah wrangler-nya** (`wrangler pages`
-hanya punya `dev`, `functions`, `project`, `deployment`, `deploy`, `secret`,
-`download`). Lewat dashboard:
+> Workers & Pages → **mambruk** → Custom domains → Set up a domain
 
-> Workers & Pages → **mambruk** → Custom domains → **Set up a domain**
+The domain must already be a site on the same Cloudflare account. Afterwards
+update the OAuth redirect URIs and the `og:url` / `og:image` tags.
 
-Syaratnya domain `mambr.uk` sudah ditambahkan sebagai situs di akun Cloudflare
-yang sama, dan nameserver-nya sudah diarahkan ke Cloudflare. Sesudah aktif,
-perbarui redirect URI OAuth serta tag `og:url` / `og:image` ke host baru.
-
----
-
-## Pengembangan lokal
+## Local development
 
 ```bash
-cp .env.example .env               # isi AUTH_SECRET dan kredensial OAuth
+cp .env.example .env
 pnpm dlx wrangler d1 execute mambruk-db --local --file=./schema.sql
-pnpm dev                            # http://localhost:4321
+pnpm dev
 ```
 
-`pnpm dev` memakai `platformProxy`, jadi binding D1 dan KV tersedia dari
-`.wrangler/state/` di folder ini — terpisah penuh dari database produksi.
+`pnpm dev` uses `platformProxy`, so D1 and KV come from `.wrangler/state/` in
+this folder, separate from production.
 
-Dua hal yang memakan waktu kalau tidak tahu:
-
-- **`.env` dibaca sekali saat server start.** Mengeditnya selagi server hidup
-  tidak berefek, dan gejalanya menyesatkan: semua sesi gagal diam-diam seolah
-  cookie-nya rusak. Restart setiap habis menyentuh file itu. (Wrangler juga
-  masih menerima `.dev.vars`; proyek ini memilih `.env` saja agar tidak ada
-  dua tempat rahasia.)
-- **Buka lewat `localhost`, jangan `127.0.0.1`.** `redirect_uri` dibentuk dari
-  origin yang dipakai browser, dan yang terdaftar di OAuth App adalah
-  `localhost`. Beda host berarti *redirect_uri mismatch*.
-
-Melihat isi database lokal maupun produksi:
+- `.env` is read once at startup. Editing it while the server runs changes
+  nothing, and sessions then fail silently as if the cookie were bad.
+- Local D1 state is keyed by `database_id`. Change the id and the local
+  database looks empty; re-apply `schema.sql`.
+- Open `localhost`, not `127.0.0.1`. The redirect URI follows the origin, and
+  the OAuth app registers `localhost`.
 
 ```bash
 pnpm dlx wrangler d1 execute mambruk-db --local  --command="SELECT * FROM links"
 pnpm dlx wrangler d1 execute mambruk-db --remote --command="SELECT * FROM links"
 ```
 
-> `--command` menjalankan banyak statement sebagai satu batch: satu statement
-> gagal, semuanya batal, dan pesannya cuma menyebut file log. Saat menyemai
-> data manual, jalankan satu per satu.
+`--command` runs multiple statements as one batch: one failure rolls back the
+lot and reports only a log file path. Seed by hand one statement at a time.
 
----
+## Bindings missing in production
 
-## Jebakan: binding hilang di produksi
+Deploy succeeds, the landing page and `/app` work, but anything touching the
+database returns 503 or 404.
 
-Gejalanya: deploy sukses, landing dan `/app` terbuka normal, tapi setiap route
-yang menyentuh database balas 503 atau 404 — `/@handle` jadi 404, `/api/shorten`
-jadi `Service temporarily unavailable`.
+Environments do not inherit bindings. One `[env.production]` block in
+`wrangler.toml`, even for a single `vars` entry, means the production
+deployment uses that block alone and the top-level D1 and KV bindings are
+ignored — silently.
 
-Sebabnya hampir selalu sama: **environment di wrangler tidak mewarisi binding
-dari level atas.** Begitu `wrangler.toml` punya blok `[env.production]` —
-sekadar untuk satu `vars` sekalipun — deploy ke branch produksi hanya memakai
-isi blok itu. `[[d1_databases]]` dan `[[kv_namespaces]]` di level atas
-diabaikan, tanpa peringatan apa pun saat deploy.
-
-Periksa apa yang benar-benar terpasang, bukan apa yang tertulis di repo:
+Check what is actually deployed:
 
 ```bash
-mkdir /tmp/cek && cd /tmp/cek
+mkdir /tmp/check && cd /tmp/check
 pnpm dlx wrangler pages download config mambruk
 cat wrangler.toml
 ```
 
-(Jalankan di folder kosong — perintah ini menimpa `wrangler.toml` di folder
-tempat ia dijalankan.)
+Run it in an empty folder; it overwrites `wrangler.toml` where it runs.
 
-Kalau blok binding-nya tidak muncul di situ, pilih salah satu: hapus semua
-blok `[env.*]` sehingga level atas berlaku untuk semua environment, atau salin
-**seluruh** binding ke dalam setiap blok environment. Proyek ini memilih yang
-pertama.
+Either drop the `[env.*]` blocks so the top level applies everywhere, or copy
+every binding into each one. This project does the former.
 
----
+## Login fails with `?error=token_exchange`
 
-## Log dan rollback
+```bash
+pnpm dlx wrangler pages deployment tail --project-name mambruk
+```
+
+`incorrect_client_credentials` means `GITHUB_CLIENT_SECRET` does not match its
+client id. GitHub shows a client secret once; generating a new one kills the
+old immediately, including the copy in `.env`.
+
+## Logs and rollback
 
 ```bash
 pnpm dlx wrangler pages deployment tail --project-name mambruk
 pnpm dlx wrangler pages deployment list --project-name mambruk
 ```
 
-Rollback dilakukan dengan mempromosikan deployment lama dari dashboard Pages
-(Deployments → pilih → Rollback), atau cukup deploy ulang commit sebelumnya.
-`wrangler pages` tidak punya perintah rollback.
+Rollback is a dashboard action (Deployments → pick one → Rollback) or simply
+deploying an earlier commit. `wrangler pages` has no rollback command.
 
----
+## Before going public
 
-## Daftar periksa sebelum terbit ke publik
-
-- [ ] `database_id` dan kedua id KV di `wrangler.toml` sudah terisi, bukan placeholder
-- [ ] `AUTH_SECRET` produksi terpasang dan berbeda dari `.dev.vars`
-- [ ] Redirect URI OAuth produksi sudah ditambahkan di GitHub dan Google
-- [ ] `schema.sql` sudah diterapkan ke database remote
-- [ ] `pnpm test` dan `pnpm build` lolos
-- [ ] `.dev.vars` tidak ikut ter-commit (`git check-ignore .dev.vars` harus menjawab)
+- [ ] `database_id` and both KV ids filled in, not placeholders
+- [ ] Production `AUTH_SECRET` set and different from `.env`
+- [ ] Production OAuth redirect URIs added
+- [ ] `schema.sql` applied to the remote database
+- [ ] `pnpm test` and `pnpm build` pass
+- [ ] `git check-ignore .env` answers

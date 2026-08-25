@@ -1,5 +1,10 @@
 import type { APIRoute } from 'astro'
-import { PROVIDERS, credentials, isProvider, setStateCookie } from '../../../utils/auth'
+import {
+  PROVIDERS,
+  credentials,
+  isProvider,
+  setStateCookie,
+} from '../../../utils/auth'
 
 export const GET: APIRoute = async (context) => {
   const provider = context.params.provider
@@ -8,13 +13,12 @@ export const GET: APIRoute = async (context) => {
   const creds = credentials(context.locals, provider)
   if (!creds) {
     return new Response(
-      `Login ${PROVIDERS[provider].label} belum dikonfigurasi di server.`,
+      `${PROVIDERS[provider].label} login is not configured on the server.`,
       { status: 503 }
     )
   }
 
-  // State acak yang disimpan di cookie ber-tanda tangan: tanpa ini, orang lain
-  // bisa memancing browser korban menyelesaikan alur login milik penyerang.
+  // Random state, kept in a signed cookie and checked on the way back.
   const state = crypto.randomUUID()
   const url = new URL(PROVIDERS[provider].authorize)
   url.searchParams.set('client_id', creds.id)

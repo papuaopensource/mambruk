@@ -7,14 +7,18 @@ export interface Props {
 
 import { ICONS } from '../utils/icons.js'
 
-
 const { name } = Astro.props
 const icon = ICONS[name ?? ''] ?? ICONS.link
 ---
 
 {
   icon.filled ? (
-    <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+    <svg
+      class="w-5 h-5 flex-shrink-0"
+      fill="currentColor"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
       <path d={icon.d} />
     </svg>
   ) : (
