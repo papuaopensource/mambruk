@@ -6,9 +6,11 @@ See DEPLOYMENT.md for anything involving wrangler.
 ## Language
 
 English everywhere in the repo: comments, docs, commit messages, test names,
-identifiers, error messages, warnings and logs. Indonesian stays only in UI
-copy a visitor reads — headings, labels, buttons — because the audience is
-Indonesian.
+identifiers, error messages, warnings and logs. Indonesian is only kept for a
+brand line such as the Papua Open Source tagline.
+
+No em dashes anywhere, in code or prose. Use a comma, a full stop, or restructure
+the sentence.
 
 ## Comments
 
@@ -42,9 +44,9 @@ change that works, delete over add. No abstraction with one caller.
 ## Database
 
 `schema.sql` is the shape for fresh databases and never migrates an existing
-one — `CREATE TABLE IF NOT EXISTS` will not add a column. Changes to a live
-table go in `migrations/NNNN_name.sql` as a one-off. Delete a migration once
-every database has moved past it.
+one, since `CREATE TABLE IF NOT EXISTS` will not add a column. Changes to a
+live table go in `migrations/NNNN_name.sql` as a one-off. Delete a migration
+once every database has moved past it.
 
 ## Branches
 

@@ -30,8 +30,8 @@ Copy `database_id` from the output into `wrangler.toml`. Then apply the schema:
 pnpm dlx wrangler d1 execute mambruk-db --remote --file=./schema.sql
 ```
 
-`schema.sql` uses `CREATE TABLE IF NOT EXISTS`, so re-running it is safe — and
-for the same reason it will not add a column to a table that already exists.
+`schema.sql` uses `CREATE TABLE IF NOT EXISTS`, so re-running it is safe. For
+the same reason it will not add a column to a table that already exists.
 Existing databases take the files in `migrations/` instead.
 
 ## 3. KV for rate limiting
@@ -94,7 +94,7 @@ production branch makes it the production deployment, anything else becomes a
 preview with its own URL.
 
 `pages deployment list` shows a Source column with the commit wrangler picked
-up from the working tree — the quickest way to see what is actually live.
+up from the working tree, the quickest way to see what is actually live.
 
 ## 7. Migrations
 
@@ -164,7 +164,7 @@ database returns 503 or 404.
 Environments do not inherit bindings. One `[env.production]` block in
 `wrangler.toml`, even for a single `vars` entry, means the production
 deployment uses that block alone and the top-level D1 and KV bindings are
-ignored — silently.
+silently ignored.
 
 Check what is actually deployed:
 
