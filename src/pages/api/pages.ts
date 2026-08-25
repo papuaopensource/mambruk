@@ -18,7 +18,7 @@ export const POST: APIRoute = async (context) => {
     .toLowerCase()
   const title = String(form.get('title') ?? '').trim()
   const tagline = String(form.get('tagline') ?? '').trim()
-  const theme = String(form.get('theme') ?? 'brutal').trim()
+  const theme = String(form.get('theme') ?? 'noir').trim()
 
   if (!isHandle(handle)) {
     return json({ error: 'Handle tidak valid atau sudah dipesan sistem' }, 400)

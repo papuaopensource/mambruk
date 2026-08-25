@@ -60,7 +60,7 @@ const title = page ? page.title : 'Halaman tidak ditemukan'
 
 // Warna dirender jadi CSS variable pada pembungkus. Nilainya sudah disaring
 // jadi #rrggbb di resolveTheme, jadi aman ditulis ke atribut style.
-const style = themeStyle(resolveTheme(page?.theme ?? 'brutal', page?.colors ?? null))
+const style = themeStyle(resolveTheme(page?.theme ?? 'noir', page?.colors ?? null))
 ---
 
 <Layout title={title} description={page?.tagline ?? undefined}>

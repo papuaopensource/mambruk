@@ -62,7 +62,7 @@ const providers = Object.entries(PROVIDERS)
 
 // Nilai yang tampil di pemilih warna: preset halaman ini, sudah ditimpa warna
 // pilihan pemiliknya.
-const colors = resolveTheme(page?.theme ?? 'brutal', page?.colors ?? null)
+const colors = resolveTheme(page?.theme ?? 'noir', page?.colors ?? null)
 const TOKEN_LABELS: Record<string, string> = {
   bg: 'Latar halaman',
   surface: 'Latar kartu',
@@ -124,6 +124,9 @@ const TOKEN_LABELS: Record<string, string> = {
             <p class="text-xs font-semibold uppercase tracking-widest text-neutral-400 mb-4">
               Halaman Bio
             </p>
+
+            <div class="lg:grid lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-8">
+              <div>
             {page ? (
               <p>
                 <a class="font-mono underline" href={`/@${page.handle}`}>
@@ -135,7 +138,7 @@ const TOKEN_LABELS: Record<string, string> = {
               <p class="text-neutral-600">Kamu belum punya halaman.</p>
             )}
 
-            <form method="POST" action="/api/pages" class="mt-4 flex flex-col gap-3">
+            <form id="pageForm" method="POST" action="/api/pages" class="mt-4 flex flex-col gap-3">
               <input
                 name="handle"
                 value={page?.handle}
@@ -158,19 +161,48 @@ const TOKEN_LABELS: Record<string, string> = {
                 class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none"
               />
 
-              <label class="text-sm font-medium text-neutral-700">
-                Tema
-                <select
-                  name="theme"
-                  class="mt-1 w-full px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none"
-                >
+              <fieldset>
+                <legend class="text-sm font-medium text-neutral-700 mb-2">
+                  Tema
+                </legend>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {Object.entries(THEMES).map(([name, theme]) => (
-                    <option value={name} selected={(page?.theme ?? 'brutal') === name}>
-                      {theme.label}
-                    </option>
+                    <label class="cursor-pointer">
+                      <input
+                        type="radio"
+                        name="theme"
+                        value={name}
+                        checked={(page?.theme ?? 'noir') === name}
+                        class="peer sr-only"
+                      />
+                      <div class="rounded-lg border-2 border-neutral-200 p-2 transition-colors peer-checked:border-neutral-800 peer-focus-visible:ring-2 peer-focus-visible:ring-neutral-400">
+                        <div
+                          class="aspect-[3/4] rounded flex flex-col items-center justify-center gap-1.5 px-2"
+                          style={`background:${theme.bg}`}
+                        >
+                          <span
+                            class="text-base font-bold leading-none"
+                            style={`color:${theme.fg}`}
+                          >
+                            Aa
+                          </span>
+                          <span
+                            class="w-full h-2.5 rounded-sm"
+                            style={`background:${theme.btn_bg};border:1px solid ${theme.btn_border}`}
+                          />
+                          <span
+                            class="w-full h-2.5 rounded-sm"
+                            style={`background:${theme.btn_bg};border:1px solid ${theme.btn_border}`}
+                          />
+                        </div>
+                        <p class="mt-1.5 text-xs text-center text-neutral-600">
+                          {theme.label}
+                        </p>
+                      </div>
+                    </label>
                   ))}
-                </select>
-              </label>
+                </div>
+              </fieldset>
 
               <fieldset class="border-2 border-neutral-200 rounded-lg p-4">
                 <legend class="px-1 text-sm font-medium text-neutral-700">
@@ -199,6 +231,30 @@ const TOKEN_LABELS: Record<string, string> = {
                 {page ? 'Simpan' : 'Klaim handle'}
               </button>
             </form>
+              </div>
+
+              {page && (
+                <div class="mt-8 lg:mt-0">
+                  <p class="text-xs font-semibold uppercase tracking-widest text-neutral-400 mb-3">
+                    Pratinjau
+                  </p>
+                  <div class="lg:sticky lg:top-6">
+                    <div class="mx-auto w-[280px] rounded-[2rem] border-8 border-neutral-800 overflow-hidden bg-white">
+                      <iframe
+                        id="preview"
+                        src={`/@${page.handle}`}
+                        title="Pratinjau halaman bio"
+                        class="w-full h-[520px] border-0"
+                      />
+                    </div>
+                    <p class="mt-3 text-xs text-neutral-500 text-center">
+                      Warna ikut berubah saat kamu memilih. Isi halaman baru
+                      ikut setelah disimpan.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
           </section>
 
 
@@ -376,3 +432,50 @@ const TOKEN_LABELS: Record<string, string> = {
     }
   </main>
 </Layout>
+
+<script>
+  import { THEMES, TOKENS } from '../../utils/theme.js'
+
+  const form = document.getElementById('pageForm') as HTMLFormElement | null
+  const frame = document.getElementById('preview') as HTMLIFrameElement | null
+
+  if (form && frame) {
+    // Pratinjau satu asal dengan dashboard, jadi variabelnya bisa langsung
+    // disetel ke dokumen di dalamnya — tanpa reload, tanpa postMessage.
+    const paint = () => {
+      const root = frame.contentDocument?.querySelector('main')
+      if (!(root instanceof HTMLElement)) return
+      for (const token of TOKENS) {
+        const input = form.querySelector(`input[name="${token}"]`)
+        if (input instanceof HTMLInputElement) {
+          root.style.setProperty(`--mb-${token}`, input.value)
+        }
+      }
+    }
+
+    form.addEventListener('change', (event) => {
+      const target = event.target
+      // Memilih tema mengisi ulang seluruh pemilih warna, seperti memulai dari
+      // preset itu. Tanpa ini, warna custom lama menempel dan pilihan tema
+      // seolah tidak berpengaruh.
+      if (target instanceof HTMLInputElement && target.name === 'theme') {
+        const preset = THEMES[target.value]
+        if (preset) {
+          for (const token of TOKENS) {
+            const input = form.querySelector(`input[name="${token}"]`)
+            if (input instanceof HTMLInputElement) input.value = preset[token]
+          }
+        }
+      }
+      paint()
+    })
+
+    // Pemilih warna memancarkan input saat digeser, change hanya saat selesai.
+    form.addEventListener('input', paint)
+    frame.addEventListener('load', paint)
+
+    // Sebagian browser memulihkan isian form saat halaman dibuka lagi dari
+    // riwayat; tanpa cat sekali di awal, pratinjau tidak cocok dengan isian.
+    paint()
+  }
+</script>
