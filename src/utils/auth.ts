@@ -115,14 +115,23 @@ export async function getUser(context: APIContext): Promise<User | null> {
   }
   if (!sessionId) return null
 
-  const row = await db
-    .prepare(
-      `SELECT u.id, u.email, u.name, u.avatar_url, u.plan, s.expires_at
-       FROM sessions s JOIN users u ON u.id = s.user_id
-       WHERE s.id = ?`
-    )
-    .bind(sessionId)
-    .first<User & { expires_at: number }>()
+  // Gangguan database tidak boleh menjatuhkan halaman: pengunjung yang
+  // memegang cookie akan melihat 500 di halaman depan, sementara yang tidak
+  // punya cookie melihat halaman normal. Anggap saja belum masuk.
+  let row: (User & { expires_at: number }) | null = null
+  try {
+    row = await db
+      .prepare(
+        `SELECT u.id, u.email, u.name, u.avatar_url, u.plan, s.expires_at
+         FROM sessions s JOIN users u ON u.id = s.user_id
+         WHERE s.id = ?`
+      )
+      .bind(sessionId)
+      .first<User & { expires_at: number }>()
+  } catch (error) {
+    console.error('Gagal membaca sesi:', error)
+    return null
+  }
 
   if (!row) return null
   if (row.expires_at < Date.now()) {
