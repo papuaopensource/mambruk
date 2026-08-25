@@ -34,22 +34,22 @@ test('isHexColor menolak yang bisa menyuntik CSS', () => {
 })
 
 test('resolveTheme jatuh ke brutal saat tema tidak dikenal', () => {
-  assert.deepEqual(resolveTheme('tidakada', null), resolveTheme('brutal', null))
+  assert.deepEqual(resolveTheme('tidakada', null), resolveTheme('noir', null))
 })
 
 test('resolveTheme memakai timpaan yang sah dan membuang yang tidak', () => {
   const colors = resolveTheme(
-    'brutal',
+    'noir',
     JSON.stringify({ bg: '#123456', fg: 'red; content:"x"', muted: '#ABCDEF' })
   )
   assert.equal(colors.bg, '#123456')
   assert.equal(colors.muted, '#abcdef')
-  assert.equal(colors.fg, THEMES.brutal.fg, 'nilai berbahaya harus diabaikan')
+  assert.equal(colors.fg, THEMES.noir.fg, 'nilai berbahaya harus diabaikan')
 })
 
 test('resolveTheme bertahan terhadap JSON rusak', () => {
-  assert.deepEqual(resolveTheme('brutal', '{bukan json'), resolveTheme('brutal', null))
-  assert.deepEqual(resolveTheme('brutal', '"bukan objek"'), resolveTheme('brutal', null))
+  assert.deepEqual(resolveTheme('noir', '{bukan json'), resolveTheme('noir', null))
+  assert.deepEqual(resolveTheme('noir', '"bukan objek"'), resolveTheme('noir', null))
 })
 
 test('themeStyle hanya memuat token yang dikenal', () => {
@@ -59,9 +59,9 @@ test('themeStyle hanya memuat token yang dikenal', () => {
 })
 
 test('pickOverrides hanya menyimpan yang berbeda dari preset', () => {
-  const base = THEMES.brutal
-  assert.equal(pickOverrides('brutal', { ...base }), null)
-  const json = pickOverrides('brutal', { ...base, bg: '#000000' })
+  const base = THEMES.noir
+  assert.equal(pickOverrides('noir', { ...base }), null)
+  const json = pickOverrides('noir', { ...base, bg: '#000000' })
   assert.deepEqual(JSON.parse(json), { bg: '#000000' })
-  assert.equal(pickOverrides('brutal', { ...base, bg: 'rgb(0,0,0)' }), null)
+  assert.equal(pickOverrides('noir', { ...base, bg: 'rgb(0,0,0)' }), null)
 })

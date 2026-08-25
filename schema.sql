@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS pages (
   title TEXT NOT NULL,
   tagline TEXT,
   avatar_url TEXT,
-  theme TEXT NOT NULL DEFAULT 'brutal',
+  theme TEXT NOT NULL DEFAULT 'noir',
   colors TEXT,
   published INTEGER NOT NULL DEFAULT 1,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -69,7 +69,7 @@ VALUES (
   'Papua Open Source',
   'Kontribusi Berbasis Open Source untuk Tanah Papua',
   '/assets/pos-logo.png',
-  'brutal'
+  'noir'
 );
 
 DELETE FROM page_links WHERE handle = 'papuaopensource';

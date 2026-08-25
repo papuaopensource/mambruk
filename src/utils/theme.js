@@ -15,45 +15,95 @@ export const TOKENS = [
 ]
 
 export const THEMES = {
-  brutal: {
-    label: 'Brutal (bawaan)',
+  noir: {
+    label: 'Noir',
     bg: '#f5f5f5',
     surface: '#ffffff',
-    fg: '#262626',
+    fg: '#171717',
     muted: '#737373',
     btn_bg: '#ffffff',
-    btn_fg: '#525252',
-    btn_border: '#262626',
+    btn_fg: '#262626',
+    btn_border: '#171717',
   },
-  malam: {
-    label: 'Malam',
-    bg: '#0a0a0a',
-    surface: '#171717',
-    fg: '#fafafa',
-    muted: '#a3a3a3',
-    btn_bg: '#171717',
-    btn_fg: '#e5e5e5',
-    btn_border: '#e5e5e5',
-  },
-  papua: {
-    label: 'Papua',
-    bg: '#f0fdf4',
+  air: {
+    label: 'Air',
+    bg: '#ffffff',
     surface: '#ffffff',
-    fg: '#14532d',
-    muted: '#4d7c62',
-    btn_bg: '#ffffff',
-    btn_fg: '#14532d',
-    btn_border: '#15803d',
+    fg: '#18181b',
+    muted: '#a1a1aa',
+    btn_bg: '#f4f4f5',
+    btn_fg: '#18181b',
+    btn_border: '#e4e4e7',
   },
-  senja: {
-    label: 'Senja',
+  mineral: {
+    label: 'Mineral',
+    bg: '#efe9e1',
+    surface: '#f8f5f1',
+    fg: '#3f3a34',
+    muted: '#8a8078',
+    btn_bg: '#ffffff',
+    btn_fg: '#3f3a34',
+    btn_border: '#d6cec3',
+  },
+  sage: {
+    label: 'Sage',
+    bg: '#e8ede8',
+    surface: '#f6f9f6',
+    fg: '#24382c',
+    muted: '#6b8274',
+    btn_bg: '#ffffff',
+    btn_fg: '#24382c',
+    btn_border: '#a8c0b0',
+  },
+  bloom: {
+    label: 'Bloom',
+    bg: '#fdf2f8',
+    surface: '#ffffff',
+    fg: '#831843',
+    muted: '#be6b93',
+    btn_bg: '#ffffff',
+    btn_fg: '#831843',
+    btn_border: '#f9a8d4',
+  },
+  rise: {
+    label: 'Rise',
     bg: '#fff7ed',
     surface: '#ffffff',
     fg: '#7c2d12',
-    muted: '#9a6a4f',
+    muted: '#b06a45',
     btn_bg: '#ffffff',
     btn_fg: '#7c2d12',
-    btn_border: '#c2410c',
+    btn_border: '#fdba74',
+  },
+  lake: {
+    label: 'Lake',
+    bg: '#0f172a',
+    surface: '#1e293b',
+    fg: '#f1f5f9',
+    muted: '#94a3b8',
+    btn_bg: '#1e293b',
+    btn_fg: '#e2e8f0',
+    btn_border: '#475569',
+  },
+  twilight: {
+    label: 'Twilight',
+    bg: '#1a1425',
+    surface: '#251d33',
+    fg: '#f3e8ff',
+    muted: '#a99bc1',
+    btn_bg: '#2d2340',
+    btn_fg: '#f3e8ff',
+    btn_border: '#6d5b8f',
+  },
+  mono: {
+    label: 'Mono',
+    bg: '#000000',
+    surface: '#0a0a0a',
+    fg: '#ffffff',
+    muted: '#a3a3a3',
+    btn_bg: '#000000',
+    btn_fg: '#ffffff',
+    btn_border: '#ffffff',
   },
 }
 
@@ -72,7 +122,7 @@ export function isHexColor(value) {
 // tidak lolos pemeriksaan dibuang diam-diam supaya halaman tetap terbaca,
 // bukan gagal render.
 export function resolveTheme(themeName, overridesJson) {
-  const base = THEMES[themeName] ?? THEMES.brutal
+  const base = THEMES[themeName] ?? THEMES.noir
   const colors = {}
   for (const token of TOKENS) colors[token] = base[token]
 
@@ -103,7 +153,7 @@ export function themeStyle(colors) {
 // Menyaring masukan form jadi JSON yang boleh disimpan, atau null kalau tidak
 // ada yang berbeda dari presetnya.
 export function pickOverrides(themeName, input) {
-  const base = THEMES[themeName] ?? THEMES.brutal
+  const base = THEMES[themeName] ?? THEMES.noir
   const kept = {}
   for (const token of TOKENS) {
     const value = String(input[token] ?? '').toLowerCase()
