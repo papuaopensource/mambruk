@@ -131,6 +131,24 @@ juga cara mencabut semua sesi kalau ada kebocoran.
 
 Daftar secret yang sudah ada: `pnpm dlx wrangler pages secret list --project-name mambruk`.
 
+> **Secret baru tidak berlaku sampai ada deployment baru.** Pages mengikat
+> variabel saat deployment dibuat, jadi `secret put` pada deployment yang sudah
+> berjalan tidak mengubah apa pun. Selalu `pages deploy` lagi sesudahnya —
+> kalau tidak, errornya persis sama dan mudah dikira secret-nya masih salah.
+
+### Kalau login gagal dengan `?error=token_exchange`
+
+Baca sebabnya dari log, jangan menebak:
+
+```bash
+pnpm dlx wrangler pages deployment tail --project-name mambruk
+```
+
+`incorrect_client_credentials` berarti `GITHUB_CLIENT_SECRET` di Pages tidak
+cocok dengan `GITHUB_CLIENT_ID`-nya. GitHub hanya menampilkan client secret
+sekali; menekan **Generate a new client secret** membuat yang lama langsung
+mati, termasuk yang ada di `.env` lokal.
+
 ---
 
 ## 6. Build dan deploy
