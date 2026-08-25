@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro'
 import { getUser } from '../../utils/auth'
 import { isHandle } from '../../utils/code.js'
+import { THEME_NAMES, pickOverrides } from '../../utils/theme.js'
 
 // Klaim handle. Satu halaman per pengguna untuk sekarang; kuota per paket
 // menyusul bersama billing.
@@ -17,11 +18,27 @@ export const POST: APIRoute = async (context) => {
     .toLowerCase()
   const title = String(form.get('title') ?? '').trim()
   const tagline = String(form.get('tagline') ?? '').trim()
+  const theme = String(form.get('theme') ?? 'brutal').trim()
 
   if (!isHandle(handle)) {
     return json({ error: 'Handle tidak valid atau sudah dipesan sistem' }, 400)
   }
   if (!title) return json({ error: 'Judul halaman wajib diisi' }, 400)
+  if (!THEME_NAMES.includes(theme)) {
+    return json({ error: 'Tema tidak dikenal' }, 400)
+  }
+
+  // Hanya warna yang berbeda dari preset yang disimpan, dan hanya yang lolos
+  // pemeriksaan #rrggbb. Sisanya dibuang di sini, bukan saat render.
+  const colors = pickOverrides(theme, {
+    bg: form.get('bg'),
+    surface: form.get('surface'),
+    fg: form.get('fg'),
+    muted: form.get('muted'),
+    btn_bg: form.get('btn_bg'),
+    btn_fg: form.get('btn_fg'),
+    btn_border: form.get('btn_border'),
+  })
 
   const taken = await db
     .prepare('SELECT user_id FROM pages WHERE handle = ?')
@@ -41,12 +58,14 @@ export const POST: APIRoute = async (context) => {
 
   await db
     .prepare(
-      `INSERT INTO pages (handle, user_id, title, tagline)
-       VALUES (?, ?, ?, ?)
+      `INSERT INTO pages (handle, user_id, title, tagline, theme, colors)
+       VALUES (?, ?, ?, ?, ?, ?)
        ON CONFLICT(handle) DO UPDATE SET title = excluded.title,
-                                         tagline = excluded.tagline`
+                                         tagline = excluded.tagline,
+                                         theme = excluded.theme,
+                                         colors = excluded.colors`
     )
-    .bind(handle, user.id, title, tagline || null)
+    .bind(handle, user.id, title, tagline || null, theme, colors)
     .run()
 
   return context.redirect('/app', 302)
