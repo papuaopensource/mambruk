@@ -30,6 +30,16 @@ test('generateCode has the requested length and no bias holes', () => {
   assert.ok(seen.size > 490, 'codes should not repeat at this volume')
 })
 
+test('generateCode spreads evenly over the alphabet', () => {
+  const counts = new Map()
+  for (let i = 0; i < 20000; i++)
+    for (const c of generateCode(8)) counts.set(c, (counts.get(c) ?? 0) + 1)
+  assert.equal(counts.size, 62)
+  const mean = (20000 * 8) / 62
+  for (const [c, n] of counts)
+    assert.ok(Math.abs(n - mean) < mean * 0.12, `${c} drawn ${n} times`)
+})
+
 test('isAlias accepts short human-picked aliases', () => {
   for (const ok of ['ig', 'x', 'gh', 'dev-to', 'kastau_muzik', 'a1'])
     assert.ok(isAlias(ok), ok)
