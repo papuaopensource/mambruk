@@ -34,7 +34,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       )
     }
 
-    const { url } = await request.json()
+    const { url } = await request.json<{ url?: unknown }>()
 
     if (!url || typeof url !== 'string') {
       return new Response(JSON.stringify({ error: 'URL is required' }), {
