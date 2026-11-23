@@ -6,9 +6,16 @@ utils and tests.
 ## Language
 
 English everywhere in the repo: comments, docs, commit messages, test names,
-identifiers, error messages, warnings, logs and UI copy. Indonesian is kept for
-a brand line such as the Papua Open Source tagline, and for the seeded content
-of a real page.
+identifiers, error messages, warnings, logs and API responses.
+
+UI copy is Indonesian, plain and friendly, the way a person would say it.
+Address the reader as `kamu`, keep sentences short, and say what happens. No
+hype, no slang for its own sake, no exclamation marks, and no claim or promise
+the code does not back, such as a blocklist that does not exist. The help,
+privacy and terms pages follow the code, so update them with it. A page words
+its own errors instead of showing the English API message. Terms that read
+better in English stay English, such as `Dashboard`, `Preview` and the open
+source credit. Seeded content of a real page keeps its own language.
 
 No em dashes, in code or prose. Use a comma, a full stop, or restructure the
 sentence.

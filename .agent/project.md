@@ -19,11 +19,15 @@ Mambruk is a URL shortener and link-in-bio pages, run by Papua Open Source at
 src/pages/
   index.astro                landing: shorten form and bio page entry
   404.astro                  unknown codes, handles and paths
-  [code].ts                  /{code}, 302 to the target
-  r/[code].ts                legacy /r/{code}, same handler
+  about, contact, help,      text pages, written against what the code does
+  privacy, terms .astro
+  [code].astro               /{code}, countdown page, then the target
+  r/[code].astro             legacy /r/{code}, same handler
   @[handle].astro            bio page from D1
-  @[handle]/[alias].ts       /@handle/alias, a short link under a handle
-  app/index.astro            dashboard, needs a session
+  @[handle]/[alias].astro    /@handle/alias, a short link under a handle
+  login.astro                sign in with GitHub or Google
+  dashboard/index.astro      dashboard, needs a session
+  app.ts                     legacy /app, 301 to /dashboard
   api/shorten.ts             anonymous shortening
   api/links.ts               aliases under an owned handle
   api/pages.ts               claim and edit a bio page
@@ -38,8 +42,9 @@ src/utils/
   icons.js                   named icon map
   urlValidator.ts            target URL checks
   rateLimiter.ts             sliding window over KV
+  site.ts                    public address, from `site` in astro.config.mjs
 src/styles/global.css        Tailwind entry and theme
-src/components/, src/layouts/
+src/components/, src/layouts/  InfoPage.astro wraps the text pages
 public/assets/               logo, favicons
 schema.sql                   shape of a fresh database
 migrations/                  one-offs for existing databases

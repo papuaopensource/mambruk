@@ -18,6 +18,8 @@ domain. Short links live at `mambr.uk/{code}`, bio pages at
 ## Features
 
 - Shorten any URL, no account needed
+- Custom short links for signed-in users, listed in the dashboard
+- A short countdown page that shows the target before it opens
 - Bio pages with sections, icons and descriptions per link
 - Themes and custom colors for bio pages
 - Aliases under a handle, such as `mambr.uk/@{handle}/{alias}`
