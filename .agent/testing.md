@@ -9,10 +9,15 @@ in pure functions, as in `code.js`, `session.js` and `theme.js`.
 
 Non-trivial logic leaves one runnable check behind.
 
+The pre-commit hook runs Prettier on staged files and `pnpm test`. CI on
+`staging` runs the list below in order and deploys to Cloudflare Pages when all
+of it passes. Pull requests stop before the deploy.
+
 Before finishing a change:
 
 1. `pnpm format:check`
-2. `pnpm test`
-3. `pnpm build`
-4. For routes, auth or D1 changes: `pnpm dev` against the local database and
+2. `pnpm check`
+3. `pnpm test`
+4. `pnpm build`
+5. For routes, auth or D1 changes: `pnpm dev` against the local database and
    exercise the route, including the failing cases (401, 403, 404).
