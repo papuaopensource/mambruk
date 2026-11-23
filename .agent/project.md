@@ -21,7 +21,7 @@ src/pages/
   404.astro                  unknown codes, handles and paths
   about, contact, help,      text pages, written against what the code does
   privacy, terms .astro
-  [code].astro               /{code}, countdown page, then the target
+  [code].astro               /{code}, countdown for anonymous links, else 302
   r/[code].astro             legacy /r/{code}, same handler
   @[handle].astro            bio page from D1
   @[handle]/[alias].astro    /@handle/alias, a short link under a handle

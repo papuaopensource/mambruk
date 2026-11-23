@@ -3,7 +3,7 @@
 ## URL Namespace
 
 ```
-/{code}              countdown page, then the target
+/{code}              countdown page for anonymous links, else 302
 /r/{code}            legacy alias of /{code}, kept so old links work
 /@{handle}           bio page
 /@{handle}/{alias}   short link owned by a handle
@@ -21,9 +21,10 @@
 
 ## Rules
 
-- A short link renders `RedirectPage.astro`, the target with a 3 second
-  countdown, then `location.replace`, or a meta refresh without JS. Each view of
-  that page counts as a click, kept alive with `locals.cfContext.waitUntil`.
+- An anonymous short link renders `RedirectPage.astro`, the target with a 3
+  second countdown, then `location.replace`, or a meta refresh without JS. An
+  alias or a link with an owner answers a plain 302 instead. Every open counts
+  as a click, kept alive with `locals.cfContext.waitUntil`.
 - Other redirects are 302. A 301 is cached by browsers, so a target could never
   change. The one 301 is `/app`, a route that moved for good.
 - A custom root code needs a session and passes `isCustomCode` in `code.js`,

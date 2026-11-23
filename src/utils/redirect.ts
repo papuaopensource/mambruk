@@ -30,9 +30,9 @@ export async function handleRedirect(
     }
 
     const link = await db
-      .prepare('SELECT url FROM links WHERE handle = ? AND code = ?')
+      .prepare('SELECT url, user_id FROM links WHERE handle = ? AND code = ?')
       .bind(handle, code)
-      .first<{ url: string }>()
+      .first<{ url: string; user_id: string | null }>()
 
     if (!link) return rewrite('/404')
 
@@ -59,6 +59,9 @@ export async function handleRedirect(
       return redirect(home, 302)
     }
 
+    // Only anonymous links get the countdown page. An alias or a link with an
+    // owner has a signed-in user behind it, so it goes straight through.
+    if (handle || link.user_id) return redirect(link.url, 302)
     return link.url
   } catch (error) {
     console.error('Error redirecting:', error)
