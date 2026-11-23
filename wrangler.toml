@@ -1,0 +1,18 @@
+name = "mambruk"
+compatibility_date = "2026-08-01"
+pages_build_output_dir = "dist"
+
+# D1 Database
+[[d1_databases]]
+binding = "DB"
+database_name = "mambruk-db"
+database_id = "ba289505-9c7b-4841-84ee-9ef933dd168d"
+
+# KV for rate limiting
+[[kv_namespaces]]
+binding = "RATE_LIMITER"
+id = "9a7e26a046a646aea606c49ffc6713c4"
+preview_id = "8754454a92384e2c9b3634443675bb84"
+
+# No [env.*] blocks on purpose: environments do not inherit bindings, so a
+# [env.production] block would hide the D1 and KV bindings above.
