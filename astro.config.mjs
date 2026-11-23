@@ -9,7 +9,7 @@ export default defineConfig({
   adapter: cloudflare({ imageService: 'passthrough' }),
   session: false,
   // Templates rely on HTML whitespace, where a newline between text and a tag
-  // renders as a space.
+  // renders as a space. Matches astroCompressHTML in .prettierrc.cjs.
   compressHTML: true,
   vite: {
     plugins: [tailwindcss()],

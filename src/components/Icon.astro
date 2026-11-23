@@ -10,30 +10,28 @@ const { name } = Astro.props
 const icon = ICONS[name ?? ''] ?? ICONS.link
 ---
 
-{
-  icon.filled ? (
-    <svg
-      class="w-5 h-5 shrink-0"
-      fill="currentColor"
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-    >
-      <path d={icon.d} />
-    </svg>
-  ) : (
-    <svg
-      class="w-5 h-5 shrink-0"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-    >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="2"
-        d={icon.d}
-      />
-    </svg>
-  )
-}
+{icon.filled ? (
+  <svg
+    class="w-5 h-5 shrink-0"
+    fill="currentColor"
+    viewBox="0 0 24 24"
+    aria-hidden="true"
+  >
+    <path d={icon.d} />
+  </svg>
+) : (
+  <svg
+    class="w-5 h-5 shrink-0"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+    aria-hidden="true"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d={icon.d}
+    />
+  </svg>
+)}

@@ -115,26 +115,24 @@ const user = await getUser(Astro)
         </span>
       </a>
       <p class="mt-4 text-sm text-neutral-500">
-        {
-          user ? (
+        {user ? (
+          <a
+            class="underline underline-offset-4 hover:text-neutral-800"
+            href="/app"
+          >
+            Manage your page in the dashboard
+          </a>
+        ) : (
+          <>
             <a
               class="underline underline-offset-4 hover:text-neutral-800"
               href="/app"
             >
-              Manage your page in the dashboard
-            </a>
-          ) : (
-            <>
-              <a
-                class="underline underline-offset-4 hover:text-neutral-800"
-                href="/app"
-              >
-                Sign in
-              </a>{' '}
-              with GitHub or Google to build your own page.
-            </>
-          )
-        }
+              Sign in
+            </a
+            >{' '} with GitHub or Google to build your own page.
+          </>
+        )}
       </p>
     </section>
 
@@ -144,7 +142,8 @@ const user = await getUser(Astro)
         &copy; 2026
         <a
           class="hover:text-neutral-800"
-          href="https://github.com/papuaopensource">Papua Open Source</a
+          href="https://github.com/papuaopensource"
+          >Papua Open Source</a
         >
       </p>
     </footer>
