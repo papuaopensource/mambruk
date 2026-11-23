@@ -7,7 +7,7 @@ Mambruk is a URL shortener and link-in-bio pages, run by Papua Open Source at
 
 - Astro 5, `output: 'server'`, adapter `@astrojs/cloudflare` with `platformProxy`
 - Cloudflare Pages, D1 (`DB`) for data, KV (`RATE_LIMITER`) for rate limiting
-- Tailwind CSS 3 through `@astrojs/tailwind`
+- Tailwind CSS 4 through `@tailwindcss/vite`, theme in `src/styles/global.css`
 - TypeScript strict; plain `.js` for logic that tests import
 - `pnpm` 9, Node 18+
 
@@ -36,6 +36,7 @@ src/utils/
   icons.js                   named icon map
   urlValidator.ts            target URL checks
   rateLimiter.ts             sliding window over KV
+src/styles/global.css        Tailwind entry and theme
 src/components/, src/layouts/
 public/assets/               logo, favicons
 schema.sql                   shape of a fresh database

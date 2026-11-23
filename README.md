@@ -31,7 +31,7 @@ domain. Short links live at `mambr.uk/{code}`, bio pages at
 - Cloudflare Pages for hosting
 - Cloudflare D1 (SQLite) database
 - Cloudflare KV for rate limiting
-- Tailwind CSS v3
+- Tailwind CSS v4
 - OAuth with GitHub and Google
 - Wrangler for local development and deploys
 - pnpm as package manager

@@ -42,7 +42,7 @@ const user = await getUser(Astro)
           name="url"
           placeholder="https://example.com/a/very/long/link"
           required
-          class="flex-1 px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none transition-colors"
+          class="flex-1 px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-hidden transition-colors"
         />
         <button
           type="submit"
@@ -68,12 +68,12 @@ const user = await getUser(Astro)
             type="text"
             id="shortUrl"
             readonly
-            class="flex-1 px-3 py-2 bg-white border border-neutral-300 rounded font-mono text-sm"
+            class="flex-1 px-3 py-2 bg-white border border-neutral-300 rounded-sm font-mono text-sm"
           />
           <button
             id="copyBtn"
             type="button"
-            class="px-4 py-2 rounded bg-neutral-800 text-white font-medium hover:bg-neutral-700 transition-colors"
+            class="px-4 py-2 rounded-sm bg-neutral-800 text-white font-medium hover:bg-neutral-700 transition-colors"
           >
             Copy
           </button>
@@ -102,14 +102,14 @@ const user = await getUser(Astro)
         <span class="font-mono text-neutral-800">mambr.uk/@handle</span>.
       </p>
       <a
-        class="group relative inline-block mt-5 text-sm font-medium text-neutral-600 focus:outline-none active:text-neutral-800"
+        class="group relative inline-block mt-5 text-sm font-medium text-neutral-600 focus:outline-hidden active:text-neutral-800"
         href="/@papuaopensource"
       >
         <span
-          class="absolute inset-0 translate-x-1.5 translate-y-1.5 bg-neutral-800 rounded"
+          class="absolute inset-0 translate-x-1.5 translate-y-1.5 bg-neutral-800 rounded-sm"
         ></span>
         <span
-          class="relative flex items-center justify-center gap-3 rounded border border-neutral-800 bg-white px-5 py-3 group-hover:translate-x-1 group-hover:translate-y-1 group-focus:translate-x-1 group-focus:translate-y-1"
+          class="relative flex items-center justify-center gap-3 rounded-sm border border-neutral-800 bg-white px-5 py-3 group-hover:translate-x-1 group-hover:translate-y-1 group-focus:translate-x-1 group-focus:translate-y-1"
         >
           See an example: @papuaopensource
         </span>

@@ -70,7 +70,7 @@ const style = themeStyle(
     style={style}
   >
     <div
-      class="w-full max-w-xl bg-[var(--mb-surface)] shadow rounded-xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-16"
+      class="w-full max-w-xl bg-[var(--mb-surface)] shadow-sm rounded-xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-16"
     >
       {
         page ? (
@@ -102,13 +102,13 @@ const style = themeStyle(
                   <div class="grid grid-cols-1 gap-4">
                     {section.links.map((link) => (
                       <a
-                        class="group relative inline-block text-sm font-medium text-[var(--mb-btn_fg)] focus:outline-none"
+                        class="group relative inline-block text-sm font-medium text-[var(--mb-btn_fg)] focus:outline-hidden"
                         href={link.url}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        <span class="absolute inset-0 translate-x-1.5 translate-y-1.5 bg-[var(--mb-btn_border)] rounded" />
-                        <span class="relative flex items-center justify-center gap-3 rounded border border-[var(--mb-btn_border)] bg-[var(--mb-btn_bg)] px-4 py-4 group-hover:translate-x-1 group-hover:translate-y-1 group-focus:translate-x-1 group-focus:translate-y-1">
+                        <span class="absolute inset-0 translate-x-1.5 translate-y-1.5 bg-[var(--mb-btn_border)] rounded-sm" />
+                        <span class="relative flex items-center justify-center gap-3 rounded-sm border border-[var(--mb-btn_border)] bg-[var(--mb-btn_bg)] px-4 py-4 group-hover:translate-x-1 group-hover:translate-y-1 group-focus:translate-x-1 group-focus:translate-y-1">
                           <Icon name={link.icon} />
                           <span class="flex flex-col items-center">
                             <span>{link.label}</span>

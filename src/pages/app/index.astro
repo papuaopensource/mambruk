@@ -88,8 +88,8 @@ const TOKEN_LABELS: Record<string, string> = {
                 class="group relative inline-block text-sm font-medium text-neutral-600"
                 href={`/api/auth/${key}`}
               >
-                <span class="absolute inset-0 translate-x-1.5 translate-y-1.5 bg-neutral-800 rounded" />
-                <span class="relative flex items-center justify-center gap-3 rounded border border-neutral-800 bg-white py-3 group-hover:translate-x-1 group-hover:translate-y-1">
+                <span class="absolute inset-0 translate-x-1.5 translate-y-1.5 bg-neutral-800 rounded-sm" />
+                <span class="relative flex items-center justify-center gap-3 rounded-sm border border-neutral-800 bg-white py-3 group-hover:translate-x-1 group-hover:translate-y-1">
                   Continue with {provider.label}
                 </span>
               </a>
@@ -149,20 +149,20 @@ const TOKEN_LABELS: Record<string, string> = {
                     readonly={!!page}
                     required
                     placeholder="handle (lowercase, digits, -)"
-                    class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none read-only:bg-neutral-100"
+                    class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-hidden read-only:bg-neutral-100"
                   />
                   <input
                     name="title"
                     value={page?.title}
                     required
                     placeholder="Page title"
-                    class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none"
+                    class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-hidden"
                   />
                   <input
                     name="tagline"
                     value={page?.tagline ?? ''}
                     placeholder="Tagline (optional)"
-                    class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none"
+                    class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-hidden"
                   />
 
                   <fieldset>
@@ -181,7 +181,7 @@ const TOKEN_LABELS: Record<string, string> = {
                           />
                           <div class="rounded-lg border-2 border-neutral-200 p-2 transition-colors peer-checked:border-neutral-800 peer-focus-visible:ring-2 peer-focus-visible:ring-neutral-400">
                             <div
-                              class="aspect-[3/4] rounded flex flex-col items-center justify-center gap-1.5 px-2"
+                              class="aspect-[3/4] rounded-sm flex flex-col items-center justify-center gap-1.5 px-2"
                               style={`background:${theme.bg}`}
                             >
                               <span
@@ -224,7 +224,7 @@ const TOKEN_LABELS: Record<string, string> = {
                             type="color"
                             name={token}
                             value={colors[token]}
-                            class="h-9 w-14 rounded border border-neutral-300 bg-white"
+                            class="h-9 w-14 rounded-sm border border-neutral-300 bg-white"
                           />
                         </label>
                       ))}
@@ -342,26 +342,26 @@ const TOKEN_LABELS: Record<string, string> = {
                   name="label"
                   required
                   placeholder="Button label, e.g. Follow us on Instagram"
-                  class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none"
+                  class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-hidden"
                 />
                 <input
                   type="url"
                   name="url"
                   required
                   placeholder="https://destination.com/..."
-                  class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none"
+                  class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-hidden"
                 />
                 <input
                   name="description"
                   placeholder="Short description (optional)"
-                  class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none"
+                  class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-hidden"
                 />
                 <div class="flex flex-col sm:flex-row gap-3">
                   <input
                     name="section"
                     list="sections"
                     placeholder="Section, e.g. Social (optional)"
-                    class="flex-1 px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none"
+                    class="flex-1 px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-hidden"
                   />
                   <datalist id="sections">
                     {[
@@ -374,7 +374,7 @@ const TOKEN_LABELS: Record<string, string> = {
                   </datalist>
                   <select
                     name="icon"
-                    class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none"
+                    class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-hidden"
                   >
                     <option value="">Icon: default</option>
                     {ICON_NAMES.map((name) => (
@@ -428,14 +428,14 @@ const TOKEN_LABELS: Record<string, string> = {
                   name="alias"
                   required
                   placeholder="alias, e.g. ig"
-                  class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none"
+                  class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-hidden"
                 />
                 <input
                   type="url"
                   name="url"
                   required
                   placeholder="https://destination.com/..."
-                  class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none"
+                  class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-hidden"
                 />
                 <button class="px-6 py-3 rounded-lg bg-neutral-800 text-white font-semibold hover:bg-neutral-700">
                   Save alias
