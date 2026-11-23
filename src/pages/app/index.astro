@@ -475,8 +475,8 @@ const TOKEN_LABELS: Record<string, string> = {
   if (form && frame) {
     // Same origin, so the variables can be set on the framed document directly.
     const paint = () => {
-      const root = frame.contentDocument?.querySelector('main')
-      if (!(root instanceof HTMLElement)) return
+      const root = frame.contentDocument?.querySelector<HTMLElement>('main')
+      if (!root) return
       for (const token of TOKENS) {
         const input = form.querySelector(`input[name="${token}"]`)
         if (input instanceof HTMLInputElement) {
