@@ -1,5 +1,5 @@
 ---
-// Aliases under the handle, with their click counts.
+// Aliases under the handle, with their click counts, edit and delete.
 import LinkRow from './LinkRow.astro'
 import { HOST as host } from '../../utils/site'
 
@@ -9,6 +9,8 @@ export interface Props {
 }
 
 const { handle, links } = Astro.props
+const ACTION_BUTTON =
+  'cursor-pointer rounded-md px-2 py-1 text-xs font-medium text-neutral-500'
 ---
 
 <section class="card">
@@ -26,19 +28,64 @@ const { handle, links } = Astro.props
     </p>
   ) : (
     <ul class="divide-y divide-neutral-100">
-      {links.map((link) => (
-        <LinkRow
-          href={`/@${handle}/${link.code}`}
-          label={`${host}/@${handle}/${link.code}`}
-          url={link.url}
-          clicks={link.clicks}
-        />
-      ))}
+      {links.map((link) => <LinkRow
+        href={`/@${handle}/${link.code}`}
+        label={`${host}/@${handle}/${link.code}`}
+        url={link.url}
+        clicks={link.clicks}
+      >
+        <div class="flex w-full shrink-0 items-center justify-end sm:w-auto">
+          <details class="relative">
+            <summary
+              class:list={[
+                ACTION_BUTTON,
+                'list-none hover:bg-neutral-100 hover:text-neutral-900 [&::-webkit-details-marker]:hidden',
+              ]}
+            >
+              Ubah
+            </summary>
+            <form
+              method="POST"
+              action="/api/links"
+              class="card absolute right-0 z-10 mt-2 w-72 max-w-[calc(100vw-2.5rem)] p-3 shadow-lg"
+            >
+              <input type="hidden" name="action" value="update" />
+              <input type="hidden" name="alias" value={link.code} />
+              <label class="block">
+                <span class="field-label">Tujuan baru</span>
+                <input
+                  type="url"
+                  name="url"
+                  value={link.url}
+                  required
+                  class="field"
+                />
+              </label>
+              <div class="mt-3 flex justify-end">
+                <button class="btn btn-primary h-8">Simpan</button>
+              </div>
+            </form>
+          </details>
+          <form
+            method="POST"
+            action="/api/links"
+            data-confirm={`Hapus /@${handle}/${link.code}? Link ini akan berhenti bekerja di mana pun sudah dibagikan.`}
+          >
+            <input type="hidden" name="action" value="delete" />
+            <input type="hidden" name="alias" value={link.code} />
+            <button
+              class:list={[ACTION_BUTTON, 'hover:bg-red-50 hover:text-red-600']}
+            >
+              Hapus
+            </button>
+          </form>
+        </div>
+      </LinkRow>)}
     </ul>
   )}
 
   <form method="POST" action="/api/links" class="border-t border-neutral-100">
-    <input type="hidden" name="handle" value={handle} />
+    <input type="hidden" name="action" value="add" />
     <div class="grid gap-4 p-5 sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
       <label class="block">
         <span class="field-label">Alias</span>
@@ -73,3 +120,14 @@ const { handle, links } = Astro.props
     </footer>
   </form>
 </section>
+
+<script>
+  // Deleting an alias breaks every copy already shared, so ask first.
+  for (const form of document.querySelectorAll<HTMLFormElement>(
+    'form[data-confirm]'
+  )) {
+    form.addEventListener('submit', (event) => {
+      if (!confirm(form.dataset.confirm)) event.preventDefault()
+    })
+  }
+</script>
