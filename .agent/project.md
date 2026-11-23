@@ -63,6 +63,7 @@ GOOGLE_CLIENT_SECRET
 pnpm install
 pnpm dev                 # astro dev with local D1 and KV in .wrangler/state
 pnpm test                # node --test test/*.test.mjs
+pnpm check               # astro check, types in .ts and .astro
 pnpm build
 pnpm preview             # wrangler pages dev dist
 pnpm format              # prettier --write
