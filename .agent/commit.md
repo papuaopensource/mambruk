@@ -1,6 +1,6 @@
 # Commits
 
-Conventional Commits on the first line:
+`.husky/commit-msg` enforces Conventional Commits on the first line:
 
 ```text
 type(scope): description
