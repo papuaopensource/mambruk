@@ -1,0 +1,11 @@
+---
+import RedirectPage from '../components/RedirectPage.astro'
+import { handleRedirect } from '../utils/redirect'
+
+export const prerender = false
+
+const target = await handleRedirect(Astro)
+if (target instanceof Response) return target
+---
+
+<RedirectPage url={target} />

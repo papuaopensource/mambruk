@@ -74,13 +74,14 @@ export const GET: APIRoute = async (context) => {
 
   const creds = credentials(provider)
   const db = env.DB
-  if (!creds || !db) return context.redirect('/?error=auth_unavailable', 302)
+  if (!creds || !db)
+    return context.redirect('/login?error=auth_unavailable', 302)
 
   const code = context.url.searchParams.get('code')
   const state = context.url.searchParams.get('state')
   const expected = await readStateCookie(context)
   if (!code || !state || !expected || state !== expected) {
-    return context.redirect('/?error=state_mismatch', 302)
+    return context.redirect('/login?error=state_mismatch', 302)
   }
 
   // Form encoded, not JSON. Google rejects a JSON body here, GitHub takes both.
@@ -109,18 +110,18 @@ export const GET: APIRoute = async (context) => {
       `error=${payload?.error}`,
       `description=${payload?.error_description}`
     )
-    return context.redirect('/?error=token_exchange', 302)
+    return context.redirect('/login?error=token_exchange', 302)
   }
 
   const profile = await fetchProfile(provider, accessToken)
-  if (!profile) return context.redirect('/?error=no_verified_email', 302)
+  if (!profile) return context.redirect('/login?error=no_verified_email', 302)
 
   const userId = await upsertUser(db, { provider, ...profile })
   const sessionCookie = await createSession(context, userId)
 
   return new Response(null, {
     status: 302,
-    headers: { Location: '/app', 'Set-Cookie': sessionCookie },
+    headers: { Location: '/dashboard', 'Set-Cookie': sessionCookie },
   })
 }
 

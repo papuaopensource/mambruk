@@ -2,9 +2,17 @@ import type { APIRoute } from 'astro'
 import { env } from 'cloudflare:workers'
 import { URLValidator } from '../../utils/urlValidator'
 import { RATE_LIMITS, getClientIP } from '../../utils/rateLimiter'
-import { generateCode } from '../../utils/code.js'
+import { generateCode, isCode, isCustomCode } from '../../utils/code.js'
+import { getUser } from '../../utils/auth'
 
-export const POST: APIRoute = async ({ request }) => {
+const json = (body: unknown, status: number) =>
+  new Response(JSON.stringify(body), {
+    status,
+    headers: { 'Content-Type': 'application/json' },
+  })
+
+export const POST: APIRoute = async (context) => {
+  const { request } = context
   try {
     const clientIP = getClientIP(request)
 
@@ -35,7 +43,10 @@ export const POST: APIRoute = async ({ request }) => {
       )
     }
 
-    const { url } = await request.json<{ url?: unknown }>()
+    const { url, code: picked } = await request.json<{
+      url?: unknown
+      code?: unknown
+    }>()
 
     if (!url || typeof url !== 'string') {
       return new Response(JSON.stringify({ error: 'URL is required' }), {
@@ -83,10 +94,30 @@ export const POST: APIRoute = async ({ request }) => {
       )
     }
 
-    const existing = await db
-      .prepare("SELECT code FROM links WHERE url = ? AND handle = ''")
-      .bind(url)
-      .first()
+    // A custom code needs a session. Reserved words read as taken.
+    const user = await getUser(context)
+    const custom = typeof picked === 'string' ? picked.trim() : ''
+    if (custom) {
+      if (!user) return json({ error: 'Sign in to pick a custom link' }, 401)
+      if (!isCode(custom)) return json({ error: 'Invalid custom link' }, 400)
+      const taken =
+        !isCustomCode(custom) ||
+        (await db
+          .prepare("SELECT id FROM links WHERE handle = '' AND code = ?")
+          .bind(custom)
+          .first())
+      if (taken) return json({ error: 'That link is not available' }, 409)
+    }
+
+    // Same URL, same owner, same code. Anonymous links share NULL.
+    const existing = custom
+      ? null
+      : await db
+          .prepare(
+            "SELECT code FROM links WHERE url = ? AND handle = '' AND user_id IS ?"
+          )
+          .bind(url, user?.id ?? null)
+          .first()
 
     if (existing) {
       return new Response(JSON.stringify({ code: existing.code, url }), {
@@ -98,31 +129,22 @@ export const POST: APIRoute = async ({ request }) => {
       })
     }
 
-    let code: string
-    let attempts = 0
-    const maxAttempts = 10
-
-    do {
-      code = generateCode()
-      const existingCode = await db
+    let code = custom
+    for (let attempt = 0; !code && attempt < 10; attempt++) {
+      const candidate = generateCode()
+      const clash = await db
         .prepare("SELECT id FROM links WHERE code = ? AND handle = ''")
-        .bind(code)
+        .bind(candidate)
         .first()
-
-      if (!existingCode) break
-
-      attempts++
-      if (attempts >= maxAttempts) {
-        code = generateCode(8)
-        break
-      }
-    } while (attempts < maxAttempts)
+      if (!clash) code = candidate
+    }
+    if (!code) code = generateCode(8)
 
     const result = await db
       .prepare(
-        'INSERT INTO links (handle, code, url, created_at) VALUES (\'\', ?, ?, datetime("now"))'
+        'INSERT INTO links (handle, code, url, user_id, created_at) VALUES (\'\', ?, ?, ?, datetime("now"))'
       )
-      .bind(code, url)
+      .bind(code, url, user?.id ?? null)
       .run()
 
     if (!result.success) {
@@ -137,6 +159,10 @@ export const POST: APIRoute = async ({ request }) => {
       },
     })
   } catch (error) {
+    // Two people picked the same custom code at once.
+    if (String(error).includes('UNIQUE')) {
+      return json({ error: 'That link is not available' }, 409)
+    }
     console.error('Error shortening URL:', error)
 
     // Internal errors stay out of the response.

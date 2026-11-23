@@ -1,0 +1,42 @@
+---
+// Top bar of the app pages. A page may replace the actions on the right.
+import Logo from './Logo.astro'
+import { getUser, type User } from '../utils/auth'
+
+export interface Props {
+  user?: User | null
+}
+
+// undefined means the page did not look the user up, so look here.
+const user =
+  Astro.props.user === undefined ? await getUser(Astro) : Astro.props.user
+const account = user
+  ? { label: 'Dashboard', href: '/dashboard' }
+  : { label: 'Masuk', href: '/login' }
+---
+
+<header
+  class="sticky top-0 z-30 border-b border-neutral-200/80 bg-white/80 backdrop-blur-md"
+>
+  <div
+    class="mx-auto flex h-14 max-w-5xl items-center justify-between gap-4 px-4 sm:px-6"
+  >
+    <a
+      href="/"
+      class="flex items-center gap-2.5 rounded-full focus-visible:ring-4 focus-visible:ring-goura-200 focus-visible:outline-hidden"
+    >
+      <Logo class="size-7" />
+      <span class="text-[15px] font-semibold tracking-tight">Mambruk</span>
+    </a>
+    <div class="flex items-center gap-2">
+      <slot>
+        {Astro.url.pathname !== account.href && <a
+          class="btn btn-primary"
+          href={account.href}
+        >
+          {account.label}
+        </a>}
+      </slot>
+    </div>
+  </div>
+</header>

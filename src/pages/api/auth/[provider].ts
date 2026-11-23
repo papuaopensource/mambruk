@@ -11,12 +11,7 @@ export const GET: APIRoute = async (context) => {
   if (!isProvider(provider)) return context.redirect('/', 302)
 
   const creds = credentials(provider)
-  if (!creds) {
-    return new Response(
-      `${PROVIDERS[provider].label} login is not configured on the server.`,
-      { status: 503 }
-    )
-  }
+  if (!creds) return context.redirect('/login?error=auth_unavailable', 302)
 
   // Random state, kept in a signed cookie and checked on the way back.
   const state = crypto.randomUUID()

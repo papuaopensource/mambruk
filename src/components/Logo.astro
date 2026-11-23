@@ -1,0 +1,10 @@
+---
+// Mambruk mark. A placeholder until the real logo lands in public/assets.
+export interface Props {
+  class?: string
+}
+
+const { class: className = 'size-7' } = Astro.props
+---
+
+<img src="/assets/logo.svg" alt="" width="32" height="32" class={className} />

@@ -1,0 +1,25 @@
+---
+// One question on the help page. The slot holds the answer.
+import UiIcon from './UiIcon.astro'
+
+export interface Props {
+  q: string
+}
+
+const { q } = Astro.props
+---
+
+<details class="group border-b border-neutral-200 py-4">
+  <summary
+    class="flex cursor-pointer list-none items-center justify-between gap-4 font-medium text-neutral-900 [&::-webkit-details-marker]:hidden"
+  >
+    {q}
+    <UiIcon
+      name="plus"
+      class="size-4 shrink-0 text-neutral-400 transition group-open:rotate-45"
+    />
+  </summary>
+  <div class="pt-2 text-neutral-600 [&>p]:my-2">
+    <slot />
+  </div>
+</details>

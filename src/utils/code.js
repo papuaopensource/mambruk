@@ -17,15 +17,16 @@ export function isAlias(value) {
   return typeof value === 'string' && ALIAS_RE.test(value)
 }
 
-// Reserved for product routes.
-const RESERVED_HANDLES = new Set([
-  'api',
+// Top-level routes and product words. No handle or custom code may take one.
+const RESERVED = new Set([
   'app',
+  'api',
   'admin',
   'login',
   'logout',
   'auth',
   'about',
+  'contact',
   'help',
   'support',
   'terms',
@@ -40,13 +41,17 @@ const RESERVED_HANDLES = new Set([
   'r',
 ])
 
+// isCustomCode checks a code a signed-in user picked. Case is ignored for the
+// reserved words, so /About cannot shadow /about.
+export function isCustomCode(value) {
+  return isCode(value) && !RESERVED.has(value.toLowerCase())
+}
+
 export const HANDLE_RE = /^[a-z0-9][a-z0-9-]{1,29}$/
 
 export function isHandle(value) {
   return (
-    typeof value === 'string' &&
-    HANDLE_RE.test(value) &&
-    !RESERVED_HANDLES.has(value)
+    typeof value === 'string' && HANDLE_RE.test(value) && !RESERVED.has(value)
   )
 }
 
