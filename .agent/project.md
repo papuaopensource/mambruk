@@ -41,7 +41,6 @@ public/assets/               logo, favicons
 schema.sql                   shape of a fresh database
 migrations/                  one-offs for existing databases
 test/                        node --test files
-index.html, assets/          the old static page, served from master
 ```
 
 ## Environment Variables

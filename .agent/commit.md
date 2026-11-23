@@ -26,9 +26,10 @@ chore: switch repo language to English
 
 ## Branches
 
-`feat/add-*` and `chore/*`, stacked on the branch they build on. `master` holds
-the old static page; app work merges into `staging`, the production branch on
-Cloudflare Pages.
+`feat/add-*` and `chore/*`, stacked on the branch they build on. Code merges
+into `staging`, the production branch on Cloudflare Pages, and `staging` merges
+into `master`, the default branch. Docs-only changes may go straight to
+`master`; fast-forward `staging` after.
 
 ## Workflow
 
