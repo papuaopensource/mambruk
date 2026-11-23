@@ -8,10 +8,13 @@ CREATE TABLE IF NOT EXISTS links (
   url TEXT NOT NULL,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   clicks INTEGER DEFAULT 0,
+  -- Owner of a link made while signed in. NULL for anonymous links.
+  user_id TEXT REFERENCES users(id) ON DELETE SET NULL,
   UNIQUE(handle, code)
 );
 CREATE INDEX IF NOT EXISTS idx_links_code ON links(handle, code);
 CREATE INDEX IF NOT EXISTS idx_links_created_at ON links(created_at);
+CREATE INDEX IF NOT EXISTS idx_links_user ON links(user_id);
 
 CREATE TABLE IF NOT EXISTS users (
   id TEXT PRIMARY KEY,
