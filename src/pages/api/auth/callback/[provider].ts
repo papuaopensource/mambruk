@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro'
+import { env } from 'cloudflare:workers'
 import {
   PROVIDERS,
   createSession,
@@ -71,8 +72,8 @@ export const GET: APIRoute = async (context) => {
   const provider = context.params.provider
   if (!isProvider(provider)) return context.redirect('/', 302)
 
-  const creds = credentials(context.locals, provider)
-  const db = context.locals.runtime?.env?.DB
+  const creds = credentials(provider)
+  const db = env.DB
   if (!creds || !db) return context.redirect('/?error=auth_unavailable', 302)
 
   const code = context.url.searchParams.get('code')

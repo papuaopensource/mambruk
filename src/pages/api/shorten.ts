@@ -1,13 +1,14 @@
 import type { APIRoute } from 'astro'
+import { env } from 'cloudflare:workers'
 import { URLValidator } from '../../utils/urlValidator'
 import { RATE_LIMITS, getClientIP } from '../../utils/rateLimiter'
 import { generateCode } from '../../utils/code.js'
 
-export const POST: APIRoute = async ({ request, locals }) => {
+export const POST: APIRoute = async ({ request }) => {
   try {
     const clientIP = getClientIP(request)
 
-    const rateLimitKV = locals.runtime?.env?.RATE_LIMITER
+    const rateLimitKV = env.RATE_LIMITER
     const rateLimitResult = await RATE_LIMITS.URL_SHORTENING.checkLimit(
       rateLimitKV,
       clientIP
@@ -68,7 +69,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       )
     }
 
-    const db = locals.runtime?.env?.DB
+    const db = env.DB
     if (!db) {
       console.error(
         'Database not available - check D1 binding in wrangler.toml'

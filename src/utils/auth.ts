@@ -1,4 +1,5 @@
 import type { APIContext } from 'astro'
+import { env as workerEnv } from 'cloudflare:workers'
 import { seal, unseal, readCookie } from './session.js'
 
 export const SESSION_COOKIE = 'mambruk_session'
@@ -14,6 +15,9 @@ export type User = {
 }
 
 type Env = Record<string, string | undefined> & { DB?: D1Database }
+
+// An unset secret is undefined at runtime, whatever wrangler types says.
+const env = workerEnv as unknown as Env
 
 export const PROVIDERS = {
   github: {
@@ -36,23 +40,18 @@ export function isProvider(value: unknown): value is Provider {
   return typeof value === 'string' && value in PROVIDERS
 }
 
-function env(locals: APIContext['locals']): Env {
-  return (locals.runtime?.env ?? {}) as Env
-}
-
 // No default secret. A guessable one is the same as no login.
-function secret(locals: APIContext['locals']): string {
-  const value = env(locals).AUTH_SECRET
+function secret(): string {
+  const value = env.AUTH_SECRET
   if (!value || value.length < 32) {
     throw new Error('AUTH_SECRET is not set (32 characters minimum)')
   }
   return value
 }
 
-export function credentials(locals: APIContext['locals'], provider: Provider) {
-  const e = env(locals)
-  const id = e[`${provider.toUpperCase()}_CLIENT_ID`]
-  const secretValue = e[`${provider.toUpperCase()}_CLIENT_SECRET`]
+export function credentials(provider: Provider) {
+  const id = env[`${provider.toUpperCase()}_CLIENT_ID`]
+  const secretValue = env[`${provider.toUpperCase()}_CLIENT_SECRET`]
   return id && secretValue ? { id, secret: secretValue } : null
 }
 
@@ -70,17 +69,12 @@ function cookie(name: string, value: string, maxAge: number, url: URL) {
 }
 
 export async function setStateCookie(context: APIContext, state: string) {
-  return cookie(
-    STATE_COOKIE,
-    await seal(state, secret(context.locals)),
-    600,
-    context.url
-  )
+  return cookie(STATE_COOKIE, await seal(state, secret()), 600, context.url)
 }
 
 export async function readStateCookie(context: APIContext) {
   const raw = readCookie(context.request.headers.get('cookie'), STATE_COOKIE)
-  return raw ? await unseal(raw, secret(context.locals)) : null
+  return raw ? await unseal(raw, secret()) : null
 }
 
 export function clearCookie(name: string, url: URL) {
@@ -88,7 +82,7 @@ export function clearCookie(name: string, url: URL) {
 }
 
 export async function createSession(context: APIContext, userId: string) {
-  const db = env(context.locals).DB!
+  const db = env.DB!
   const id = crypto.randomUUID()
   const expires = Date.now() + SESSION_DAYS * 86400 * 1000
   await db
@@ -97,14 +91,14 @@ export async function createSession(context: APIContext, userId: string) {
     .run()
   return cookie(
     SESSION_COOKIE,
-    await seal(id, secret(context.locals)),
+    await seal(id, secret()),
     SESSION_DAYS * 86400,
     context.url
   )
 }
 
 export async function getUser(context: APIContext): Promise<User | null> {
-  const db = env(context.locals).DB
+  const db = env.DB
   if (!db) return null
 
   const raw = readCookie(context.request.headers.get('cookie'), SESSION_COOKIE)
@@ -112,7 +106,7 @@ export async function getUser(context: APIContext): Promise<User | null> {
 
   let sessionId: string | null = null
   try {
-    sessionId = await unseal(raw, secret(context.locals))
+    sessionId = await unseal(raw, secret())
   } catch {
     return null // AUTH_SECRET not set
   }
@@ -144,11 +138,11 @@ export async function getUser(context: APIContext): Promise<User | null> {
 }
 
 export async function destroySession(context: APIContext) {
-  const db = env(context.locals).DB
+  const db = env.DB
   const raw = readCookie(context.request.headers.get('cookie'), SESSION_COOKIE)
   if (db && raw) {
     try {
-      const id = await unseal(raw, secret(context.locals))
+      const id = await unseal(raw, secret())
       if (id)
         await db.prepare('DELETE FROM sessions WHERE id = ?').bind(id).run()
     } catch {}

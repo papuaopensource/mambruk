@@ -1,4 +1,5 @@
 ---
+import { env } from 'cloudflare:workers'
 import Layout from '../../layouts/Layout.astro'
 import { getUser, PROVIDERS } from '../../utils/auth'
 import { ICON_NAMES } from '../../utils/icons.js'
@@ -7,7 +8,7 @@ import { THEMES, TOKENS, resolveTheme } from '../../utils/theme.js'
 export const prerender = false
 
 const user = await getUser(Astro)
-const db = Astro.locals.runtime?.env?.DB
+const db = env.DB
 
 type Page = {
   handle: string

@@ -20,8 +20,9 @@
   target can never change.
 - Check the code's shape with `code.js` before any D1 query, so `/favicon.ico`
   and friends cost nothing.
-- Bindings come from `locals.runtime.env`. A missing binding degrades: no `DB`
-  returns 503, no `RATE_LIMITER` lets the request through.
+- Bindings and secrets come from `env` in `cloudflare:workers`. A missing
+  binding degrades: no `DB` returns 503, no `RATE_LIMITER` lets the request
+  through.
 - No `[env.*]` blocks in `wrangler.toml`: environments do not inherit bindings.
 - One shared helper per job in `src/utils/`. Extend it before writing a second.
 - No auth or ORM library. Sessions are an HMAC-signed cookie holding an id; the

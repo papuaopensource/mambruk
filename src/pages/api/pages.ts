@@ -1,11 +1,12 @@
 import type { APIRoute } from 'astro'
+import { env } from 'cloudflare:workers'
 import { getUser } from '../../utils/auth'
 import { isHandle } from '../../utils/code.js'
 import { THEME_NAMES, pickOverrides } from '../../utils/theme.js'
 
 // Claim a handle. One page per user for now.
 export const POST: APIRoute = async (context) => {
-  const db = context.locals.runtime?.env?.DB
+  const db = env.DB
   if (!db) return json({ error: 'Service unavailable' }, 503)
 
   const user = await getUser(context)
