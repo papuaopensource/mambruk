@@ -1,0 +1,255 @@
+---
+// Claim or edit the bio page, with a live preview of its colors.
+import UiIcon from '../UiIcon.astro'
+import { THEMES, TOKENS, resolveTheme } from '../../utils/theme.js'
+import { HOST as host } from '../../utils/site'
+
+export interface Props {
+  page: {
+    handle: string
+    title: string
+    tagline: string | null
+    theme: string
+    colors: string | null
+  } | null
+}
+
+const { page } = Astro.props
+
+// What the colour inputs show, this page's preset plus its overrides.
+const colors = resolveTheme(page?.theme ?? 'noir', page?.colors ?? null)
+const TOKEN_LABELS: Record<string, string> = {
+  bg: 'Latar halaman',
+  surface: 'Latar kartu',
+  fg: 'Teks utama',
+  muted: 'Teks pendukung',
+  btn_bg: 'Latar tombol',
+  btn_fg: 'Teks tombol',
+  btn_border: 'Garis dan bayangan tombol',
+}
+---
+
+<div
+  class:list={[
+    'grid items-start gap-6',
+    page && 'lg:grid-cols-[minmax(0,1fr)_300px]',
+  ]}
+>
+  <form id="pageForm" method="POST" action="/api/pages" class="card">
+    <header class="border-b border-neutral-100 px-5 py-4">
+      <h2 class="text-sm font-semibold">Halaman bio</h2>
+      <p class="mt-0.5 text-sm text-neutral-500">
+        Handle, judul, dan tampilan halamanmu.
+      </p>
+    </header>
+
+    <div class="flex flex-col gap-6 p-5">
+      <div class="grid gap-4 sm:grid-cols-2">
+        <label class="block sm:col-span-2">
+          <span class="field-label">Handle</span>
+          <span class="flex">
+            <span class="field-addon">{host}/@</span>
+            <input
+              name="handle"
+              value={page?.handle}
+              readonly={!!page}
+              required
+              placeholder="handle-kamu"
+              class="field rounded-l-none"
+            />
+          </span>
+        </label>
+        <label class="block">
+          <span class="field-label">Judul</span>
+          <input
+            name="title"
+            value={page?.title}
+            required
+            placeholder="Nama kamu atau komunitasmu"
+            class="field"
+          />
+        </label>
+        <label class="block">
+          <span class="field-label">
+            Tagline <span class="font-normal text-neutral-400">Opsional</span>
+          </span>
+          <input
+            name="tagline"
+            value={page?.tagline ?? ''}
+            placeholder="Satu kalimat tentang halaman ini"
+            class="field"
+          />
+        </label>
+      </div>
+
+      <fieldset>
+        <legend class="field-label">Tema</legend>
+        <div class="grid grid-cols-3 gap-3 sm:grid-cols-5">
+          {Object.entries(THEMES).map(([name, theme]) => <label
+            class="cursor-pointer"
+          >
+            <input
+              type="radio"
+              name="theme"
+              value={name}
+              checked={(page?.theme ?? 'noir') === name}
+              class="peer sr-only"
+            />
+            <span
+              class="block rounded-xl border border-neutral-200 p-1.5 transition peer-checked:border-neutral-900 peer-checked:ring-1 peer-checked:ring-neutral-900 peer-focus-visible:ring-4 peer-focus-visible:ring-goura-200 hover:border-neutral-300"
+            >
+              <span
+                class="flex aspect-4/5 flex-col items-center justify-center gap-1.5 rounded-lg px-2.5"
+                style={`background:${theme.bg}`}
+              >
+                <span
+                  class="text-sm leading-none font-semibold"
+                  style={`color:${theme.fg}`}
+                >
+                  Aa
+                </span>
+                <span
+                  class="h-2.5 w-full rounded-full"
+                  style={`background:${theme.btn_bg};border:1px solid ${theme.btn_border}`}
+                ></span>
+                <span
+                  class="h-2.5 w-full rounded-full"
+                  style={`background:${theme.btn_bg};border:1px solid ${theme.btn_border}`}
+                ></span>
+              </span>
+              <span class="mt-1.5 block text-center text-xs text-neutral-600">
+                {theme.label}
+              </span>
+            </span>
+          </label>)}
+        </div>
+      </fieldset>
+
+      <details
+        class="group rounded-xl border border-neutral-200"
+        open={!!page?.colors}
+      >
+        <summary
+          class="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-medium [&::-webkit-details-marker]:hidden"
+        >
+          Atur warna sendiri
+          <span
+            class="flex items-center gap-2 text-xs font-normal text-neutral-500"
+          >
+            <span class="group-open:hidden">Ikut tema</span>
+            <UiIcon
+              name="arrow-down"
+              class="size-3.5 transition group-open:rotate-180"
+            />
+          </span>
+        </summary>
+        <div class="border-t border-neutral-100 p-4">
+          <p class="mb-4 text-xs text-pretty text-neutral-500">
+            Warna yang sama dengan tema tidak disimpan, jadi kamu tetap bisa
+            ganti tema kapan saja.
+          </p>
+          <div class="grid gap-x-6 gap-y-3 sm:grid-cols-2">
+            {TOKENS.map((token) => <label
+              class="flex items-center justify-between gap-3 text-sm text-neutral-600"
+            >
+              {TOKEN_LABELS[token]}
+              <input
+                type="color"
+                name={token}
+                value={colors[token]}
+                class="h-8 w-12 cursor-pointer rounded-md border border-neutral-200 bg-white p-0.5"
+              />
+            </label>)}
+          </div>
+        </div>
+      </details>
+    </div>
+
+    <footer
+      class="flex items-center justify-between gap-3 rounded-b-xl border-t border-neutral-100 bg-neutral-50 px-5 py-3"
+    >
+      <p class="text-xs text-neutral-500">
+        {page
+          ? 'Perubahan tampil setelah disimpan.'
+          : 'Huruf kecil, angka, dan tanda hubung. Handle tidak bisa diganti setelah diklaim.'}
+      </p>
+      <button class="btn btn-primary">
+        {page ? 'Simpan perubahan' : 'Klaim handle'}
+      </button>
+    </footer>
+  </form>
+
+  {page && <aside class="card p-4 lg:sticky lg:top-20">
+    <div class="flex items-center justify-between">
+      <p class="text-sm font-semibold">Preview</p>
+      <a
+        class="flex items-center gap-1 text-xs text-neutral-500 hover:text-neutral-900"
+        href={`/@${page.handle}`}
+        target="_blank"
+        rel="noopener"
+      >
+        Buka
+        <UiIcon name="arrow-up-right" class="size-3" />
+      </a>
+    </div>
+    <div
+      class="mx-auto mt-4 w-64 overflow-hidden rounded-[1.75rem] border-6 border-neutral-900 bg-white shadow-lg"
+    >
+      <!-- Rendered at phone width, then scaled into the 244px frame. -->
+      <div class="h-122 overflow-hidden">
+        <iframe
+          id="preview"
+          src={`/@${page.handle}`}
+          title="Preview halaman bio"
+          class="h-195 w-97.5 origin-top-left scale-[0.6256] border-0"
+        ></iframe>
+      </div>
+    </div>
+    <p class="mt-3 text-center text-xs text-neutral-500">
+      Warna langsung berubah. Isi halaman berubah setelah disimpan.
+    </p>
+  </aside>}
+</div>
+
+<script>
+  import { THEMES, TOKENS } from '../../utils/theme.js'
+
+  const form = document.getElementById('pageForm') as HTMLFormElement | null
+  const frame = document.getElementById('preview') as HTMLIFrameElement | null
+
+  if (form && frame) {
+    // Same origin, so the variables can be set on the framed document directly.
+    const paint = () => {
+      const root = frame.contentDocument?.querySelector<HTMLElement>('main')
+      if (!root) return
+      for (const token of TOKENS) {
+        const input = form.querySelector(`input[name="${token}"]`)
+        if (input instanceof HTMLInputElement) {
+          root.style.setProperty(`--mb-${token}`, input.value)
+        }
+      }
+    }
+
+    form.addEventListener('change', (event) => {
+      const target = event.target
+      // Picking a theme refills every colour input from that preset.
+      if (target instanceof HTMLInputElement && target.name === 'theme') {
+        const preset = THEMES[target.value]
+        if (preset) {
+          for (const token of TOKENS) {
+            const input = form.querySelector(`input[name="${token}"]`)
+            if (input instanceof HTMLInputElement) input.value = preset[token]
+          }
+        }
+      }
+      paint()
+    })
+
+    // Colour inputs fire input while dragging, change only at the end.
+    form.addEventListener('input', paint)
+    frame.addEventListener('load', paint)
+
+    // Some browsers restore form values on back-navigation.
+    paint()
+  }
+</script>

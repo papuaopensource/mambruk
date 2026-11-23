@@ -44,7 +44,7 @@ export const POST: APIRoute = async (context) => {
     .bind(handle, alias, url)
     .run()
 
-  return context.redirect('/app', 302)
+  return context.redirect('/dashboard', 302)
 }
 
 function json(body: unknown, status: number) {

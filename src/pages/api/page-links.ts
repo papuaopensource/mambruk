@@ -59,7 +59,7 @@ export const POST: APIRoute = async (context) => {
       )
       .run()
 
-    return context.redirect('/app', 302)
+    return context.redirect('/dashboard', 302)
   }
 
   const id = Number(form.get('id'))
@@ -73,7 +73,7 @@ export const POST: APIRoute = async (context) => {
       .run()
     // Nothing deleted means the id belongs to someone else.
     if (!result.meta.changes) return json({ error: 'Unknown link' }, 404)
-    return context.redirect('/app', 302)
+    return context.redirect('/dashboard', 302)
   }
 
   if (action === 'move') {
@@ -112,7 +112,7 @@ export const POST: APIRoute = async (context) => {
           .bind(current.position, neighbour.id),
       ])
     }
-    return context.redirect('/app', 302)
+    return context.redirect('/dashboard', 302)
   }
 
   return json({ error: 'Unknown action' }, 400)

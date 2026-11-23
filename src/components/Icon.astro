@@ -2,17 +2,18 @@
 // `icon` is free text in page_links, so an unknown name gets the link glyph.
 export interface Props {
   name?: string | null
+  class?: string
 }
 
 import { ICONS } from '../utils/icons.js'
 
-const { name } = Astro.props
+const { name, class: className = 'size-5' } = Astro.props
 const icon = ICONS[name ?? ''] ?? ICONS.link
 ---
 
 {icon.filled ? (
   <svg
-    class="w-5 h-5 shrink-0"
+    class:list={[className, 'shrink-0']}
     fill="currentColor"
     viewBox="0 0 24 24"
     aria-hidden="true"
@@ -21,7 +22,7 @@ const icon = ICONS[name ?? ''] ?? ICONS.link
   </svg>
 ) : (
   <svg
-    class="w-5 h-5 shrink-0"
+    class:list={[className, 'shrink-0']}
     fill="none"
     stroke="currentColor"
     viewBox="0 0 24 24"

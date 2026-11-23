@@ -3,6 +3,7 @@ import cloudflare from '@astrojs/cloudflare'
 import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
+  site: 'https://mambr.uk',
   output: 'server',
   // No image service and no sessions, so the Worker gets no IMAGES or SESSION
   // binding.
