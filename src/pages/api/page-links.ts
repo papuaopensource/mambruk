@@ -3,7 +3,7 @@ import { getUser } from '../../utils/auth'
 import { URLValidator } from '../../utils/urlValidator'
 import { ICON_NAMES } from '../../utils/icons.js'
 
-// Bio page link editor. The handle comes from the session, never from the form.
+// Bio page link editor. The handle comes from the session, not the form.
 export const POST: APIRoute = async (context) => {
   const db = context.locals.runtime?.env?.DB
   if (!db) return json({ error: 'Service unavailable' }, 503)
@@ -64,7 +64,7 @@ export const POST: APIRoute = async (context) => {
   const id = Number(form.get('id'))
   if (!Number.isInteger(id)) return json({ error: 'Unknown link' }, 400)
 
-  // Every write carries the owner's handle in its WHERE: ids are guessable.
+  // Every write filters on the owner's handle, since ids are guessable.
   if (action === 'delete') {
     const result = await db
       .prepare('DELETE FROM page_links WHERE id = ? AND handle = ?')
@@ -100,7 +100,7 @@ export const POST: APIRoute = async (context) => {
       .bind(page.handle, current.position)
       .first<{ id: number; position: number }>()
 
-    // Already at the end, nothing to swap.
+    // Last in its list, nothing to swap.
     if (neighbour) {
       await db.batch([
         db

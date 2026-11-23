@@ -60,7 +60,7 @@ if (user && db) {
 
 const providers = Object.entries(PROVIDERS)
 
-// What the colour inputs show: this page's preset plus its overrides.
+// What the colour inputs show, this page's preset plus its overrides.
 const colors = resolveTheme(page?.theme ?? 'noir', page?.colors ?? null)
 const TOKEN_LABELS: Record<string, string> = {
   bg: 'Page background',

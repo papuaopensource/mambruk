@@ -31,7 +31,7 @@ async function fetchProfile(
     )
     if (!user) return null
 
-    // Public profile may hide the email; take the primary verified one.
+    // Public profile may hide the email, so take the primary verified one.
     let email: string | null = user.email ?? null
     if (!email) {
       const emails = await fetch('https://api.github.com/user/emails', {
@@ -82,7 +82,7 @@ export const GET: APIRoute = async (context) => {
     return context.redirect('/?error=state_mismatch', 302)
   }
 
-  // Form encoded, not JSON: Google rejects a JSON body here, GitHub takes both.
+  // Form encoded, not JSON. Google rejects a JSON body here, GitHub takes both.
   const tokenResponse = await fetch(PROVIDERS[provider].token, {
     method: 'POST',
     headers: {
@@ -102,7 +102,7 @@ export const GET: APIRoute = async (context) => {
   const payload = await tokenResponse.json<any>().catch(() => null)
   const accessToken = payload?.access_token
   if (!accessToken) {
-    // The provider's own reason, otherwise only ?error=token_exchange is visible.
+    // The provider's reason. The redirect carries ?error=token_exchange alone.
     console.error(
       `Token exchange failed for ${provider}: status=${tokenResponse.status}`,
       `error=${payload?.error}`,

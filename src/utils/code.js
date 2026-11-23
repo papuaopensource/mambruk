@@ -3,7 +3,7 @@
 const ALPHABET =
   'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
 
-// 4-32 chars, no dots: /favicon.ico and /robots.txt never reach D1.
+// 4-32 chars, no dots, so /favicon.ico and /robots.txt never reach D1.
 export const CODE_RE = /^[A-Za-z0-9_-]{4,32}$/
 
 export function isCode(value) {

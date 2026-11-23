@@ -1,4 +1,4 @@
-// Bio page themes: colour tokens rendered as CSS variables. Token model from
+// Bio page themes, colour tokens rendered as CSS variables. Token model from
 // treelink (github.com/trevortylerlee/treelink), trimmed to what this design uses.
 
 export const TOKENS = [
@@ -11,7 +11,6 @@ export const TOKENS = [
   'btn_border', // Button border and shadow
 ]
 
-// Preset themes
 export const THEMES = {
   noir: {
     label: 'Noir',
@@ -107,14 +106,14 @@ export const THEMES = {
 
 export const THEME_NAMES = Object.keys(THEMES)
 
-// #rrggbb only. Values go straight into a style attribute.
+// #rrggbb, because values go into a style attribute unescaped.
 export const HEX_RE = /^#[0-9a-f]{6}$/
 
 export function isHexColor(value) {
   return typeof value === 'string' && HEX_RE.test(value.toLowerCase())
 }
 
-// Preset merged with the owner's overrides. Invalid values are dropped.
+// resolveTheme merges the owner's valid overrides onto the preset.
 export function resolveTheme(themeName, overridesJson) {
   const base = THEMES[themeName] ?? THEMES.noir
   const colors = {}
@@ -139,12 +138,12 @@ export function resolveTheme(themeName, overridesJson) {
   return colors
 }
 
-// Style attribute for the page wrapper.
+// themeStyle renders colors as CSS variables for the page wrapper.
 export function themeStyle(colors) {
   return TOKENS.map((token) => `--mb-${token}: ${colors[token]}`).join('; ')
 }
 
-// Form input to JSON, or null when nothing differs from the preset.
+// pickOverrides turns form input into JSON, or null when it matches the preset.
 export function pickOverrides(themeName, input) {
   const base = THEMES[themeName] ?? THEMES.noir
   const kept = {}

@@ -1,6 +1,6 @@
 -- Mambruk SQLite schema for Cloudflare D1
 
--- Links (short URLs) Table
+-- Short links. handle is '' for root codes, since UNIQUE ignores NULLs.
 CREATE TABLE IF NOT EXISTS links (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   handle TEXT NOT NULL DEFAULT '',
@@ -13,7 +13,6 @@ CREATE TABLE IF NOT EXISTS links (
 CREATE INDEX IF NOT EXISTS idx_links_code ON links(handle, code);
 CREATE INDEX IF NOT EXISTS idx_links_created_at ON links(created_at);
 
--- Users Table
 CREATE TABLE IF NOT EXISTS users (
   id TEXT PRIMARY KEY,
   email TEXT NOT NULL,
@@ -33,7 +32,6 @@ CREATE TABLE IF NOT EXISTS sessions (
 );
 CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id);
 
--- Bio pages Table
 CREATE TABLE IF NOT EXISTS pages (
   handle TEXT PRIMARY KEY,
   user_id TEXT REFERENCES users(id) ON DELETE CASCADE,
@@ -58,7 +56,7 @@ CREATE TABLE IF NOT EXISTS page_links (
 );
 CREATE INDEX IF NOT EXISTS idx_page_links_handle ON page_links(handle, position);
 
--- Seed: Papua Open Source
+-- Seed Papua Open Source
 INSERT OR REPLACE INTO pages (handle, title, tagline, avatar_url, theme)
 VALUES (
   'papuaopensource',
@@ -78,7 +76,7 @@ INSERT INTO page_links (handle, section, label, description, url, icon, position
   ('papuaopensource', 'Media Sosial', 'Baca Tulisan Kami di Dev To', NULL, 'https://dev.to/papuaopensource', 'article', 6),
   ('papuaopensource', 'Open Source', 'Jelajahi GitHub Kami', NULL, 'https://github.com/papuaopensource', 'github', 7);
 
--- Seed: @papuaopensource alias
+-- Seed the @papuaopensource alias
 DELETE FROM links WHERE handle = 'papuaopensource';
 INSERT INTO links (handle, code, url) VALUES
   ('papuaopensource', 'ig', 'https://instagram.com/papuaopensource'),
