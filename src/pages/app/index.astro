@@ -60,28 +60,27 @@ if (user && db) {
 
 const providers = Object.entries(PROVIDERS)
 
-// Nilai yang tampil di pemilih warna: preset halaman ini, sudah ditimpa warna
-// pilihan pemiliknya.
-const colors = resolveTheme(page?.theme ?? 'brutal', page?.colors ?? null)
+// What the colour inputs show, this page's preset plus its overrides.
+const colors = resolveTheme(page?.theme ?? 'noir', page?.colors ?? null)
 const TOKEN_LABELS: Record<string, string> = {
-  bg: 'Latar halaman',
-  surface: 'Latar kartu',
-  fg: 'Teks utama',
-  muted: 'Teks sekunder',
-  btn_bg: 'Latar tombol',
-  btn_fg: 'Teks tombol',
-  btn_border: 'Garis & bayangan tombol',
+  bg: 'Page background',
+  surface: 'Card background',
+  fg: 'Primary text',
+  muted: 'Secondary text',
+  btn_bg: 'Button background',
+  btn_fg: 'Button text',
+  btn_border: 'Button border and shadow',
 }
 ---
 
-<Layout title="Dashboard — Mambruk">
+<Layout title="Dashboard - Mambruk">
   <main class="container mx-auto px-4 py-12 max-w-2xl">
     {
       !user ? (
         <div class="bg-white border border-neutral-800 rounded-xl p-6 sm:p-8 text-center">
-          <h1 class="text-2xl font-bold">Masuk ke Mambruk</h1>
+          <h1 class="text-2xl font-bold">Sign in to Mambruk</h1>
           <p class="mt-2 text-neutral-600">
-            Masuk untuk mengklaim handle dan membuat tautan pendekmu sendiri.
+            Sign in to claim a handle and make your own short links.
           </p>
           <div class="mt-6 flex flex-col gap-4">
             {providers.map(([key, provider]) => (
@@ -91,7 +90,7 @@ const TOKEN_LABELS: Record<string, string> = {
               >
                 <span class="absolute inset-0 translate-x-1.5 translate-y-1.5 bg-neutral-800 rounded" />
                 <span class="relative flex items-center justify-center gap-3 rounded border border-neutral-800 bg-white py-3 group-hover:translate-x-1 group-hover:translate-y-1">
-                  Lanjut dengan {provider.label}
+                  Continue with {provider.label}
                 </span>
               </a>
             ))}
@@ -115,102 +114,161 @@ const TOKEN_LABELS: Record<string, string> = {
             </div>
             <form method="POST" action="/api/auth/logout">
               <button class="text-sm underline text-neutral-600 hover:text-neutral-900">
-                Keluar
+                Sign out
               </button>
             </form>
           </div>
 
           <section class="mt-8 bg-white border border-neutral-800 rounded-xl p-6 sm:p-8">
             <p class="text-xs font-semibold uppercase tracking-widest text-neutral-400 mb-4">
-              Halaman Bio
+              Bio page
             </p>
-            {page ? (
-              <p>
-                <a class="font-mono underline" href={`/@${page.handle}`}>
-                  /@{page.handle}
-                </a>
-                <span class="text-neutral-600"> — {page.title}</span>
-              </p>
-            ) : (
-              <p class="text-neutral-600">Kamu belum punya halaman.</p>
-            )}
 
-            <form method="POST" action="/api/pages" class="mt-4 flex flex-col gap-3">
-              <input
-                name="handle"
-                value={page?.handle}
-                readonly={!!page}
-                required
-                placeholder="handle (huruf kecil, angka, -)"
-                class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none read-only:bg-neutral-100"
-              />
-              <input
-                name="title"
-                value={page?.title}
-                required
-                placeholder="Judul halaman"
-                class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none"
-              />
-              <input
-                name="tagline"
-                value={page?.tagline ?? ''}
-                placeholder="Tagline (opsional)"
-                class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none"
-              />
+            <div class="lg:grid lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-8">
+              <div>
+                {page ? (
+                  <p>
+                    <a class="font-mono underline" href={`/@${page.handle}`}>
+                      /@{page.handle}
+                    </a>
+                    <span class="text-neutral-600"> - {page.title}</span>
+                  </p>
+                ) : (
+                  <p class="text-neutral-600">You don't have a page yet.</p>
+                )}
 
-              <label class="text-sm font-medium text-neutral-700">
-                Tema
-                <select
-                  name="theme"
-                  class="mt-1 w-full px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none"
+                <form
+                  id="pageForm"
+                  method="POST"
+                  action="/api/pages"
+                  class="mt-4 flex flex-col gap-3"
                 >
-                  {Object.entries(THEMES).map(([name, theme]) => (
-                    <option value={name} selected={(page?.theme ?? 'brutal') === name}>
-                      {theme.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
+                  <input
+                    name="handle"
+                    value={page?.handle}
+                    readonly={!!page}
+                    required
+                    placeholder="handle (lowercase, digits, -)"
+                    class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none read-only:bg-neutral-100"
+                  />
+                  <input
+                    name="title"
+                    value={page?.title}
+                    required
+                    placeholder="Page title"
+                    class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none"
+                  />
+                  <input
+                    name="tagline"
+                    value={page?.tagline ?? ''}
+                    placeholder="Tagline (optional)"
+                    class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none"
+                  />
 
-              <fieldset class="border-2 border-neutral-200 rounded-lg p-4">
-                <legend class="px-1 text-sm font-medium text-neutral-700">
-                  Warna
-                </legend>
-                <p class="text-xs text-neutral-500 mb-3">
-                  Kosongkan saja kalau ingin ikut tema. Warna yang sama dengan
-                  tema tidak disimpan, jadi ganti tema tetap berpengaruh.
-                </p>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {TOKENS.map((token) => (
-                    <label class="flex items-center justify-between gap-3 text-sm text-neutral-600">
-                      {TOKEN_LABELS[token]}
-                      <input
-                        type="color"
-                        name={token}
-                        value={colors[token]}
-                        class="h-9 w-14 rounded border border-neutral-300 bg-white"
+                  <fieldset>
+                    <legend class="text-sm font-medium text-neutral-700 mb-2">
+                      Theme
+                    </legend>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      {Object.entries(THEMES).map(([name, theme]) => (
+                        <label class="cursor-pointer">
+                          <input
+                            type="radio"
+                            name="theme"
+                            value={name}
+                            checked={(page?.theme ?? 'noir') === name}
+                            class="peer sr-only"
+                          />
+                          <div class="rounded-lg border-2 border-neutral-200 p-2 transition-colors peer-checked:border-neutral-800 peer-focus-visible:ring-2 peer-focus-visible:ring-neutral-400">
+                            <div
+                              class="aspect-[3/4] rounded flex flex-col items-center justify-center gap-1.5 px-2"
+                              style={`background:${theme.bg}`}
+                            >
+                              <span
+                                class="text-base font-bold leading-none"
+                                style={`color:${theme.fg}`}
+                              >
+                                Aa
+                              </span>
+                              <span
+                                class="w-full h-2.5 rounded-sm"
+                                style={`background:${theme.btn_bg};border:1px solid ${theme.btn_border}`}
+                              />
+                              <span
+                                class="w-full h-2.5 rounded-sm"
+                                style={`background:${theme.btn_bg};border:1px solid ${theme.btn_border}`}
+                              />
+                            </div>
+                            <p class="mt-1.5 text-xs text-center text-neutral-600">
+                              {theme.label}
+                            </p>
+                          </div>
+                        </label>
+                      ))}
+                    </div>
+                  </fieldset>
+
+                  <fieldset class="border-2 border-neutral-200 rounded-lg p-4">
+                    <legend class="px-1 text-sm font-medium text-neutral-700">
+                      Colours
+                    </legend>
+                    <p class="text-xs text-neutral-500 mb-3">
+                      Leave these alone to follow the theme. Colours matching
+                      the theme are not stored, so switching theme still works.
+                    </p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {TOKENS.map((token) => (
+                        <label class="flex items-center justify-between gap-3 text-sm text-neutral-600">
+                          {TOKEN_LABELS[token]}
+                          <input
+                            type="color"
+                            name={token}
+                            value={colors[token]}
+                            class="h-9 w-14 rounded border border-neutral-300 bg-white"
+                          />
+                        </label>
+                      ))}
+                    </div>
+                  </fieldset>
+
+                  <button class="px-6 py-3 rounded-lg bg-neutral-800 text-white font-semibold hover:bg-neutral-700">
+                    {page ? 'Save' : 'Claim handle'}
+                  </button>
+                </form>
+              </div>
+
+              {page && (
+                <div class="mt-8 lg:mt-0">
+                  <p class="text-xs font-semibold uppercase tracking-widest text-neutral-400 mb-3">
+                    Preview
+                  </p>
+                  <div class="lg:sticky lg:top-6">
+                    <div class="mx-auto w-[280px] rounded-[2rem] border-8 border-neutral-800 overflow-hidden bg-white">
+                      <iframe
+                        id="preview"
+                        src={`/@${page.handle}`}
+                        title="Bio page preview"
+                        class="w-full h-[520px] border-0"
                       />
-                    </label>
-                  ))}
+                    </div>
+                    <p class="mt-3 text-xs text-neutral-500 text-center">
+                      Colours follow your picks. Content updates after saving.
+                    </p>
+                  </div>
                 </div>
-              </fieldset>
-
-              <button class="px-6 py-3 rounded-lg bg-neutral-800 text-white font-semibold hover:bg-neutral-700">
-                {page ? 'Simpan' : 'Klaim handle'}
-              </button>
-            </form>
+              )}
+            </div>
           </section>
-
 
           {page && (
             <section class="mt-6 bg-white border border-neutral-800 rounded-xl p-6 sm:p-8">
               <p class="text-xs font-semibold uppercase tracking-widest text-neutral-400 mb-4">
-                Isi Halaman Bio
+                Bio page content
               </p>
 
               {pageLinks.length === 0 ? (
                 <p class="text-neutral-600">
-                  Halamanmu masih kosong. Tambahkan tombol pertama di bawah.
+                  Your page is empty. Add the first button below.
                 </p>
               ) : (
                 <ul class="flex flex-col gap-3">
@@ -224,7 +282,7 @@ const TOKEN_LABELS: Record<string, string> = {
                           <button
                             class="text-neutral-400 hover:text-neutral-800 disabled:opacity-30"
                             disabled={index === 0}
-                            aria-label="Naikkan"
+                            aria-label="Move up"
                           >
                             ↑
                           </button>
@@ -236,7 +294,7 @@ const TOKEN_LABELS: Record<string, string> = {
                           <button
                             class="text-neutral-400 hover:text-neutral-800 disabled:opacity-30"
                             disabled={index === pageLinks.length - 1}
-                            aria-label="Turunkan"
+                            aria-label="Move down"
                           >
                             ↓
                           </button>
@@ -253,16 +311,20 @@ const TOKEN_LABELS: Record<string, string> = {
                           )}
                         </p>
                         {link.description && (
-                          <p class="text-sm text-neutral-500">{link.description}</p>
+                          <p class="text-sm text-neutral-500">
+                            {link.description}
+                          </p>
                         )}
-                        <p class="text-sm text-neutral-400 truncate">{link.url}</p>
+                        <p class="text-sm text-neutral-400 truncate">
+                          {link.url}
+                        </p>
                       </div>
 
                       <form method="POST" action="/api/page-links">
                         <input type="hidden" name="action" value="delete" />
                         <input type="hidden" name="id" value={link.id} />
                         <button class="text-sm text-red-700 hover:underline">
-                          Hapus
+                          Remove
                         </button>
                       </form>
                     </li>
@@ -270,52 +332,58 @@ const TOKEN_LABELS: Record<string, string> = {
                 </ul>
               )}
 
-              <form method="POST" action="/api/page-links" class="mt-5 flex flex-col gap-3">
+              <form
+                method="POST"
+                action="/api/page-links"
+                class="mt-5 flex flex-col gap-3"
+              >
                 <input type="hidden" name="action" value="add" />
                 <input
                   name="label"
                   required
-                  placeholder="Label tombol, misal: Ikuti Kami di Instagram"
+                  placeholder="Button label, e.g. Follow us on Instagram"
                   class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none"
                 />
                 <input
                   type="url"
                   name="url"
                   required
-                  placeholder="https://tujuan.com/..."
+                  placeholder="https://destination.com/..."
                   class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none"
                 />
                 <input
                   name="description"
-                  placeholder="Keterangan singkat (opsional)"
+                  placeholder="Short description (optional)"
                   class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none"
                 />
                 <div class="flex flex-col sm:flex-row gap-3">
                   <input
                     name="section"
                     list="sections"
-                    placeholder="Seksi, misal: Media Sosial (opsional)"
+                    placeholder="Section, e.g. Social (optional)"
                     class="flex-1 px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none"
                   />
                   <datalist id="sections">
-                    {[...new Set(pageLinks.map((l) => l.section).filter(Boolean))].map(
-                      (s) => (
-                        <option value={s} />
-                      )
-                    )}
+                    {[
+                      ...new Set(
+                        pageLinks.map((l) => l.section).filter(Boolean)
+                      ),
+                    ].map((s) => (
+                      <option value={s} />
+                    ))}
                   </datalist>
                   <select
                     name="icon"
                     class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none"
                   >
-                    <option value="">Ikon: bawaan</option>
+                    <option value="">Icon: default</option>
                     {ICON_NAMES.map((name) => (
                       <option value={name}>{name}</option>
                     ))}
                   </select>
                 </div>
                 <button class="px-6 py-3 rounded-lg bg-neutral-800 text-white font-semibold hover:bg-neutral-700">
-                  Tambah tombol
+                  Add button
                 </button>
               </form>
             </section>
@@ -324,11 +392,11 @@ const TOKEN_LABELS: Record<string, string> = {
           {page && (
             <section class="mt-6 bg-white border border-neutral-800 rounded-xl p-6 sm:p-8">
               <p class="text-xs font-semibold uppercase tracking-widest text-neutral-400 mb-4">
-                Tautan Pendek
+                Short links
               </p>
 
               {aliases.length === 0 ? (
-                <p class="text-neutral-600">Belum ada alias.</p>
+                <p class="text-neutral-600">No aliases yet.</p>
               ) : (
                 <ul class="flex flex-col gap-2">
                   {aliases.map((link) => (
@@ -343,30 +411,34 @@ const TOKEN_LABELS: Record<string, string> = {
                         {link.url}
                       </span>
                       <span class="text-sm text-neutral-400 whitespace-nowrap">
-                        {link.clicks} klik
+                        {link.clicks} clicks
                       </span>
                     </li>
                   ))}
                 </ul>
               )}
 
-              <form method="POST" action="/api/links" class="mt-5 flex flex-col gap-3">
+              <form
+                method="POST"
+                action="/api/links"
+                class="mt-5 flex flex-col gap-3"
+              >
                 <input type="hidden" name="handle" value={page.handle} />
                 <input
                   name="alias"
                   required
-                  placeholder="alias, misal: ig"
+                  placeholder="alias, e.g. ig"
                   class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none"
                 />
                 <input
                   type="url"
                   name="url"
                   required
-                  placeholder="https://tujuan.com/..."
+                  placeholder="https://destination.com/..."
                   class="px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none"
                 />
                 <button class="px-6 py-3 rounded-lg bg-neutral-800 text-white font-semibold hover:bg-neutral-700">
-                  Simpan alias
+                  Save alias
                 </button>
               </form>
             </section>
@@ -376,3 +448,46 @@ const TOKEN_LABELS: Record<string, string> = {
     }
   </main>
 </Layout>
+
+<script>
+  import { THEMES, TOKENS } from '../../utils/theme.js'
+
+  const form = document.getElementById('pageForm') as HTMLFormElement | null
+  const frame = document.getElementById('preview') as HTMLIFrameElement | null
+
+  if (form && frame) {
+    // Same origin, so the variables can be set on the framed document directly.
+    const paint = () => {
+      const root = frame.contentDocument?.querySelector('main')
+      if (!(root instanceof HTMLElement)) return
+      for (const token of TOKENS) {
+        const input = form.querySelector(`input[name="${token}"]`)
+        if (input instanceof HTMLInputElement) {
+          root.style.setProperty(`--mb-${token}`, input.value)
+        }
+      }
+    }
+
+    form.addEventListener('change', (event) => {
+      const target = event.target
+      // Picking a theme refills every colour input from that preset.
+      if (target instanceof HTMLInputElement && target.name === 'theme') {
+        const preset = THEMES[target.value]
+        if (preset) {
+          for (const token of TOKENS) {
+            const input = form.querySelector(`input[name="${token}"]`)
+            if (input instanceof HTMLInputElement) input.value = preset[token]
+          }
+        }
+      }
+      paint()
+    })
+
+    // Colour inputs fire input while dragging, change only at the end.
+    form.addEventListener('input', paint)
+    frame.addEventListener('load', paint)
+
+    // Some browsers restore form values on back-navigation.
+    paint()
+  }
+</script>

@@ -1,45 +1,39 @@
-// URL Validation and Security Checks
-// Prevents malicious URLs and implements blacklisting
+// Target URL checks for format, blocklist, patterns, extension and length.
 
 interface ValidationResult {
   isValid: boolean
   reason?: string
 }
 
-// Common malicious/spam domains and patterns
 const BLACKLISTED_DOMAINS = new Set([
-  // Malware/Phishing domains (examples)
-  'bit.ly', // Prevent nested shorteners
+  // Shorteners, so links do not nest.
+  'bit.ly',
   'tinyurl.com',
   'short.link',
   'ow.ly',
   't.co',
   'goo.gl',
 
-  // Known malicious patterns (add real ones in production)
+  // Placeholders until a real blocklist exists.
   'malware-example.com',
   'phishing-site.net',
   'spam-domain.org',
 
-  // Localhost and internal networks
+  // Loopback.
   'localhost',
   '127.0.0.1',
   '0.0.0.0',
 ])
 
-// Raw IPv4 host, e.g. http://203.0.113.10/ — checked against the hostname
-// only. The old version tested this against the whole URL, which rejected any
-// link containing a dotted version number.
+// Matched against the hostname only, not the whole URL.
 const IPV4_HOSTNAME = /^[0-9]{1,3}(\.[0-9]{1,3}){3}$/
 
-// Suspicious URL patterns
 const SUSPICIOUS_PATTERNS = [
   /\b(phishing|malware|virus|trojan|scam)\b/i,
   /\b(free-money|get-rich|click-here)\b/i,
   /\b(urgent|limited-time|act-now)\b/i,
 ]
 
-// File extensions that should be blocked
 const BLOCKED_EXTENSIONS = new Set([
   'exe',
   'bat',
@@ -57,41 +51,29 @@ const BLOCKED_EXTENSIONS = new Set([
 ])
 
 export class URLValidator {
-  /**
-   * Comprehensive URL validation
-   */
   static validate(url: string): ValidationResult {
-    // Basic format validation
     const formatCheck = this.validateFormat(url)
     if (!formatCheck.isValid) return formatCheck
 
-    // Domain blacklist check
     const blacklistCheck = this.checkBlacklist(url)
     if (!blacklistCheck.isValid) return blacklistCheck
 
-    // Suspicious pattern check
     const patternCheck = this.checkSuspiciousPatterns(url)
     if (!patternCheck.isValid) return patternCheck
 
-    // File extension check
     const extensionCheck = this.checkFileExtension(url)
     if (!extensionCheck.isValid) return extensionCheck
 
-    // URL length check
     const lengthCheck = this.checkLength(url)
     if (!lengthCheck.isValid) return lengthCheck
 
     return { isValid: true }
   }
 
-  /**
-   * Basic URL format validation
-   */
   private static validateFormat(url: string): ValidationResult {
     try {
       const urlObj = new URL(url)
 
-      // Only allow HTTP/HTTPS
       if (!['http:', 'https:'].includes(urlObj.protocol)) {
         return {
           isValid: false,
@@ -99,7 +81,6 @@ export class URLValidator {
         }
       }
 
-      // Check for valid hostname
       if (!urlObj.hostname || urlObj.hostname.length === 0) {
         return {
           isValid: false,
@@ -123,15 +104,11 @@ export class URLValidator {
     }
   }
 
-  /**
-   * Check against blacklisted domains
-   */
   private static checkBlacklist(url: string): ValidationResult {
     try {
       const urlObj = new URL(url)
       const hostname = urlObj.hostname.toLowerCase()
 
-      // Check exact domain match
       if (BLACKLISTED_DOMAINS.has(hostname)) {
         return {
           isValid: false,
@@ -139,7 +116,6 @@ export class URLValidator {
         }
       }
 
-      // Check subdomain matches
       for (const blacklistedDomain of BLACKLISTED_DOMAINS) {
         if (hostname.endsWith(`.${blacklistedDomain}`)) {
           return {
@@ -155,9 +131,6 @@ export class URLValidator {
     }
   }
 
-  /**
-   * Check for suspicious patterns in URL
-   */
   private static checkSuspiciousPatterns(url: string): ValidationResult {
     const lowerUrl = url.toLowerCase()
 
@@ -173,17 +146,13 @@ export class URLValidator {
     return { isValid: true }
   }
 
-  /**
-   * Check for blocked file extensions
-   */
   private static checkFileExtension(url: string): ValidationResult {
     try {
       const urlObj = new URL(url)
       const pathname = urlObj.pathname.toLowerCase()
 
-      // Extract file extension
       const lastDot = pathname.lastIndexOf('.')
-      if (lastDot === -1) return { isValid: true } // No extension
+      if (lastDot === -1) return { isValid: true }
 
       const extension = pathname.substring(lastDot + 1)
 
@@ -196,13 +165,10 @@ export class URLValidator {
 
       return { isValid: true }
     } catch (error) {
-      return { isValid: true } // Allow if can't parse
+      return { isValid: true }
     }
   }
 
-  /**
-   * Check URL length limits
-   */
   private static checkLength(url: string): ValidationResult {
     const MAX_URL_LENGTH = 2048 // Standard browser limit
 
@@ -216,9 +182,7 @@ export class URLValidator {
     return { isValid: true }
   }
 
-  /**
-   * Check if URL is a known URL shortener (prevent nesting)
-   */
+  // isShortener covers more shorteners than the blocklist.
   static isShortener(url: string): boolean {
     try {
       const urlObj = new URL(url)
@@ -246,5 +210,9 @@ export class URLValidator {
   }
 }
 
-// Export for easy access
-export { BLACKLISTED_DOMAINS, SUSPICIOUS_PATTERNS, BLOCKED_EXTENSIONS, IPV4_HOSTNAME }
+export {
+  BLACKLISTED_DOMAINS,
+  SUSPICIOUS_PATTERNS,
+  BLOCKED_EXTENSIONS,
+  IPV4_HOSTNAME,
+}

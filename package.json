@@ -14,7 +14,10 @@
     "preview": "wrangler pages dev dist",
     "test": "node --test test/*.test.mjs",
     "format": "prettier . --write",
-    "format:check": "prettier . --check"
+    "format:check": "prettier . --check",
+    "types": "wrangler types",
+    "check": "astro check",
+    "prepare": "husky"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^12.1.0",
@@ -23,8 +26,15 @@
     "tailwindcss": "^3.4.17"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.6.2",
     "prettier": "^3.7.4",
     "prettier-plugin-astro": "^0.14.1",
+    "typescript": "^6.0.3",
     "wrangler": "^4.56.0"
+  },
+  "lint-staged": {
+    "*.{ts,js,mjs,astro,json,md,yml,css}": "prettier --write"
   }
 }

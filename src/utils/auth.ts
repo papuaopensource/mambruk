@@ -40,12 +40,11 @@ function env(locals: APIContext['locals']): Env {
   return (locals.runtime?.env ?? {}) as Env
 }
 
-// Gagal tertutup: tanpa AUTH_SECRET, jangan menandatangani apa pun dengan
-// nilai bawaan — cookie yang bisa ditebak sama saja dengan tanpa login.
+// No default secret. A guessable one is the same as no login.
 function secret(locals: APIContext['locals']): string {
   const value = env(locals).AUTH_SECRET
   if (!value || value.length < 32) {
-    throw new Error('AUTH_SECRET belum diset (minimal 32 karakter)')
+    throw new Error('AUTH_SECRET is not set (32 characters minimum)')
   }
   return value
 }
@@ -65,14 +64,18 @@ function cookie(name: string, value: string, maxAge: number, url: URL) {
     'SameSite=Lax',
     `Max-Age=${maxAge}`,
   ]
-  // Secure hanya dilewati di localhost, supaya `pnpm dev` di http tetap bisa
-  // login tanpa melemahkan produksi.
+  // Secure only on https, so  when use `pnpm dev` over http can still log in.
   if (url.protocol === 'https:') parts.push('Secure')
   return parts.join('; ')
 }
 
 export async function setStateCookie(context: APIContext, state: string) {
-  return cookie(STATE_COOKIE, await seal(state, secret(context.locals)), 600, context.url)
+  return cookie(
+    STATE_COOKIE,
+    await seal(state, secret(context.locals)),
+    600,
+    context.url
+  )
 }
 
 export async function readStateCookie(context: APIContext) {
@@ -111,13 +114,11 @@ export async function getUser(context: APIContext): Promise<User | null> {
   try {
     sessionId = await unseal(raw, secret(context.locals))
   } catch {
-    return null // AUTH_SECRET belum diset
+    return null // AUTH_SECRET not set
   }
   if (!sessionId) return null
 
-  // Gangguan database tidak boleh menjatuhkan halaman: pengunjung yang
-  // memegang cookie akan melihat 500 di halaman depan, sementara yang tidak
-  // punya cookie melihat halaman normal. Anggap saja belum masuk.
+  // A DB error here would 500 the page for anyone holding a cookie.
   let row: (User & { expires_at: number }) | null = null
   try {
     row = await db
@@ -129,7 +130,7 @@ export async function getUser(context: APIContext): Promise<User | null> {
       .bind(sessionId)
       .first<User & { expires_at: number }>()
   } catch (error) {
-    console.error('Gagal membaca sesi:', error)
+    console.error('Failed to read session:', error)
     return null
   }
 
@@ -148,10 +149,9 @@ export async function destroySession(context: APIContext) {
   if (db && raw) {
     try {
       const id = await unseal(raw, secret(context.locals))
-      if (id) await db.prepare('DELETE FROM sessions WHERE id = ?').bind(id).run()
-    } catch {
-      // AUTH_SECRET hilang: cookie tetap dihapus di bawah.
-    }
+      if (id)
+        await db.prepare('DELETE FROM sessions WHERE id = ?').bind(id).run()
+    } catch {}
   }
   return clearCookie(SESSION_COOKIE, context.url)
 }
@@ -173,7 +173,9 @@ export async function upsertUser(
 
   if (existing) {
     await db
-      .prepare('UPDATE users SET email = ?, name = ?, avatar_url = ? WHERE id = ?')
+      .prepare(
+        'UPDATE users SET email = ?, name = ?, avatar_url = ? WHERE id = ?'
+      )
       .bind(profile.email, profile.name, profile.avatarUrl, existing.id)
       .run()
     return existing.id

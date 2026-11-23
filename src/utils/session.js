@@ -1,5 +1,4 @@
-// Cookie sesi ber-tanda tangan. Plain JS supaya `node --test` bisa mengimpornya
-// tanpa loader TypeScript. Web Crypto tersedia di Node 18+ dan di Workers.
+// Signed session cookie. Plain JS so node --test can import it directly.
 
 const encoder = new TextEncoder()
 
@@ -20,8 +19,7 @@ async function hmac(value, secret) {
   return base64url(await crypto.subtle.sign('HMAC', key, encoder.encode(value)))
 }
 
-// Perbandingan waktu-tetap: keluar lebih awal saat tanda tangan salah
-// membocorkan berapa karakter yang sudah benar.
+// equals compares in constant time.
 function equals(a, b) {
   if (a.length !== b.length) return false
   let diff = 0

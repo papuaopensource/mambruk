@@ -1,12 +1,10 @@
 ---
-// Named icons for bio-page links. `icon` is a string in page_links, so an
-// unknown name falls back to the link glyph instead of rendering nothing.
+// `icon` is free text in page_links, so an unknown name gets the link glyph.
 export interface Props {
   name?: string | null
 }
 
 import { ICONS } from '../utils/icons.js'
-
 
 const { name } = Astro.props
 const icon = ICONS[name ?? ''] ?? ICONS.link
@@ -14,7 +12,12 @@ const icon = ICONS[name ?? ''] ?? ICONS.link
 
 {
   icon.filled ? (
-    <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+    <svg
+      class="w-5 h-5 flex-shrink-0"
+      fill="currentColor"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
       <path d={icon.d} />
     </svg>
   ) : (

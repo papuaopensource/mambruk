@@ -29,3 +29,7 @@ pnpm-debug.log*
 # secret lokal
 .env
 .dev.vars
+
+# internal notes
+DEPLOYMENT.md
+.local/
