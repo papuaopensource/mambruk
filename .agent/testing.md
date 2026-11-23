@@ -10,8 +10,9 @@ in pure functions, as in `code.js`, `session.js` and `theme.js`.
 Non-trivial logic leaves one runnable check behind.
 
 The pre-commit hook runs Prettier on staged files and `pnpm test`. CI on
-`staging` runs the list below in order and deploys to Cloudflare Pages when all
-of it passes. Pull requests stop before the deploy.
+`staging` chains the same steps as jobs, format, then typecheck and test, then
+build, and deploys that build to Cloudflare Pages. Pull requests stop before the
+deploy.
 
 Before finishing a change:
 
