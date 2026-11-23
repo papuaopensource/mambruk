@@ -1,5 +1,6 @@
 ---
-// One short link in a dashboard list: where it lives, where it goes, clicks.
+// One short link in a dashboard list, with its address, target and clicks.
+// The slot holds actions on the right, such as edit and delete.
 import UiIcon from '../UiIcon.astro'
 
 export interface Props {
@@ -12,7 +13,9 @@ export interface Props {
 const { href, label, url, clicks } = Astro.props
 ---
 
-<li class="flex items-center gap-3 px-5 py-3">
+<li
+  class="flex flex-wrap items-center gap-x-3 gap-y-1 px-5 py-3 sm:flex-nowrap"
+>
   <span
     class="flex size-9 shrink-0 items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-500"
   >
@@ -36,4 +39,5 @@ const { href, label, url, clicks } = Astro.props
     <UiIcon name="chart" class="size-3.5 text-goura-600" />
     {clicks.toLocaleString('id-ID')} klik
   </span>
+  <slot />
 </li>

@@ -29,7 +29,7 @@ src/pages/
   dashboard/index.astro      dashboard, needs a session
   app.ts                     legacy /app, 301 to /dashboard
   api/shorten.ts             anonymous shortening
-  api/links.ts               aliases under an owned handle
+  api/links.ts               add, update and delete aliases under a handle
   api/pages.ts               claim and edit a bio page
   api/page-links.ts          links on a bio page
   api/auth/                  OAuth start, callback, logout
