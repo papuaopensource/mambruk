@@ -2,10 +2,10 @@ name: codeql
 
 on:
   push:
-    branches: [staging]
+    branches: [master, staging]
     paths-ignore: ['**.md', 'public/**', 'assets/**']
   pull_request:
-    branches: [staging]
+    branches: [master, staging]
     paths-ignore: ['**.md', 'public/**', 'assets/**']
   schedule:
     - cron: '17 3 * * 1'
