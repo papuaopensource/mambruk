@@ -1,9 +1,8 @@
-// Rate Limiter using Cloudflare KV
-// Implements sliding window rate limiting
+// Sliding window rate limiter over KV.
 
 interface RateLimitConfig {
-  windowMs: number // Time window in milliseconds
-  maxRequests: number // Maximum requests per window
+  windowMs: number
+  maxRequests: number
 }
 
 interface RateLimitResult {
@@ -23,7 +22,6 @@ export class RateLimiter {
     kv: KVNamespace | undefined,
     identifier: string
   ): Promise<RateLimitResult> {
-    // Fallback if KV is not available (development)
     if (!kv) {
       return {
         allowed: true,
@@ -37,14 +35,11 @@ export class RateLimiter {
     const key = `rate_limit:${identifier}`
 
     try {
-      // Get existing requests from KV
       const existingData = await kv.get(key, 'json')
       let requests: number[] = existingData ? (existingData as number[]) : []
 
-      // Filter out requests outside the current window
       requests = requests.filter((timestamp) => timestamp > windowStart)
 
-      // Check if limit exceeded
       if (requests.length >= this.config.maxRequests) {
         const oldestRequest = Math.min(...requests)
         const resetTime = oldestRequest + this.config.windowMs
@@ -56,10 +51,8 @@ export class RateLimiter {
         }
       }
 
-      // Add current request
       requests.push(now)
 
-      // Store updated requests with TTL
       await kv.put(key, JSON.stringify(requests), {
         expirationTtl: Math.ceil(this.config.windowMs / 1000),
       })
@@ -71,7 +64,7 @@ export class RateLimiter {
       }
     } catch (error) {
       console.error('Rate limiter error:', error)
-      // Allow request on error to avoid blocking legitimate users
+      // Fail open, so a KV outage does not block redirects.
       return {
         allowed: true,
         remaining: this.config.maxRequests - 1,
@@ -81,28 +74,23 @@ export class RateLimiter {
   }
 }
 
-// Default rate limit configurations
 export const RATE_LIMITS = {
-  // 10 requests per minute for URL shortening
   URL_SHORTENING: new RateLimiter({
-    windowMs: 60 * 1000, // 1 minute
+    windowMs: 60 * 1000,
     maxRequests: 10,
   }),
 
-  // 100 requests per minute for redirects (more lenient)
   REDIRECTS: new RateLimiter({
-    windowMs: 60 * 1000, // 1 minute
+    windowMs: 60 * 1000,
     maxRequests: 100,
   }),
 }
 
-// Helper function to get client IP
+// getClientIP prefers Cloudflare's header. 'unknown' shares one bucket.
 export function getClientIP(request: Request): string {
-  // Try Cloudflare headers first
   const cfConnectingIP = request.headers.get('CF-Connecting-IP')
   if (cfConnectingIP) return cfConnectingIP
 
-  // Fallback to other headers
   const xForwardedFor = request.headers.get('X-Forwarded-For')
   if (xForwardedFor) {
     return xForwardedFor.split(',')[0].trim()
@@ -111,6 +99,5 @@ export function getClientIP(request: Request): string {
   const xRealIP = request.headers.get('X-Real-IP')
   if (xRealIP) return xRealIP
 
-  // Fallback for development
   return 'unknown'
 }

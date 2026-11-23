@@ -27,7 +27,7 @@ export const POST: APIRoute = async (context) => {
     return json({ error: 'Unknown theme' }, 400)
   }
 
-  // Only colours that differ from the preset are stored, so switching theme works.
+  // Colours equal to the preset are not stored, so a new theme recolours all.
   const colors = pickOverrides(theme, {
     bg: form.get('bg'),
     surface: form.get('surface'),

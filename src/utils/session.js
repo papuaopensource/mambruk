@@ -19,7 +19,7 @@ async function hmac(value, secret) {
   return base64url(await crypto.subtle.sign('HMAC', key, encoder.encode(value)))
 }
 
-// Constant time compare.
+// equals compares in constant time.
 function equals(a, b) {
   if (a.length !== b.length) return false
   let diff = 0

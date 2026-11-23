@@ -40,7 +40,7 @@ function env(locals: APIContext['locals']): Env {
   return (locals.runtime?.env ?? {}) as Env
 }
 
-// No default secret: a guessable one is the same as no login.
+// No default secret. A guessable one is the same as no login.
 function secret(locals: APIContext['locals']): string {
   const value = env(locals).AUTH_SECRET
   if (!value || value.length < 32) {
@@ -151,9 +151,7 @@ export async function destroySession(context: APIContext) {
       const id = await unseal(raw, secret(context.locals))
       if (id)
         await db.prepare('DELETE FROM sessions WHERE id = ?').bind(id).run()
-    } catch {
-      // No secret; the cookie is cleared below anyway.
-    }
+    } catch {}
   }
   return clearCookie(SESSION_COOKIE, context.url)
 }
