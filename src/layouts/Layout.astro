@@ -4,12 +4,18 @@ import '../styles/global.css'
 export interface Props {
   title?: string
   description?: string
+  image?: string
 }
 
 const {
   title = 'Mambruk: link shortener and bio pages',
   description = 'Shorten links and build a bio page in one place. From Papua Open Source.',
+  image = '/assets/pos-logo.png',
 } = Astro.props
+
+// Crawlers need absolute URLs. A malformed image leaves og:image out.
+const ogUrl = new URL(Astro.url.pathname, Astro.url.origin).href
+const ogImage = URL.parse(image, Astro.url.origin)?.href
 ---
 
 <!doctype html>
@@ -36,8 +42,9 @@ const {
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
-    <meta property="og:locale" content="id_ID" />
-    <meta property="og:image" content="/assets/pos-logo.png" />
+    <meta property="og:url" content={ogUrl} />
+    <meta property="og:locale" content="en_US" />
+    {ogImage && <meta property="og:image" content={ogImage} />}
     <meta name="twitter:card" content="summary" />
     <link rel="preconnect" href="https://fonts.bunny.net" />
     <link

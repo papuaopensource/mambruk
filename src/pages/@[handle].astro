@@ -61,7 +61,11 @@ for (const link of links) {
 const style = themeStyle(resolveTheme(page.theme, page.colors))
 ---
 
-<Layout title={page.title} description={page.tagline ?? undefined}>
+<Layout
+  title={page.title}
+  description={page.tagline ?? undefined}
+  image={page.avatar_url ?? undefined}
+>
   <main
     class="flex items-center justify-center min-h-screen p-4 bg-[var(--mb-bg)] text-[var(--mb-fg)]"
     style={style}
