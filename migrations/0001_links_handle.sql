@@ -1,9 +1,3 @@
--- Sekali jalan untuk database yang tabel links-nya sudah ada dari pemendek URL
--- lama. Database baru cukup pakai schema.sql.
---
--- SQLite tidak bisa mengubah constraint lewat ALTER TABLE, jadi tabelnya
--- dibangun ulang: UNIQUE(code) global menjadi UNIQUE(handle, code).
-
 PRAGMA foreign_keys = OFF;
 
 CREATE TABLE links_new (

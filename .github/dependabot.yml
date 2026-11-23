@@ -1,0 +1,29 @@
+version: 2
+updates:
+  - package-ecosystem: 'npm'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '09:00'
+      timezone: 'Asia/Jayapura'
+    open-pull-requests-limit: 5
+    groups:
+      astro:
+        patterns:
+          - 'astro'
+          - '@astrojs/*'
+      cloudflare:
+        patterns:
+          - 'wrangler'
+      dev-tools:
+        patterns:
+          - 'prettier*'
+          - 'husky'
+          - 'lint-staged'
+          - 'typescript'
+
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'monthly'

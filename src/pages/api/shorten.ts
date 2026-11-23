@@ -5,10 +5,8 @@ import { generateCode } from '../../utils/code.js'
 
 export const POST: APIRoute = async ({ request, locals }) => {
   try {
-    // Get client IP for rate limiting
     const clientIP = getClientIP(request)
 
-    // Check rate limit
     const rateLimitKV = locals.runtime?.env?.RATE_LIMITER
     const rateLimitResult = await RATE_LIMITS.URL_SHORTENING.checkLimit(
       rateLimitKV,
@@ -36,9 +34,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
       )
     }
 
-    const { url } = await request.json()
+    const { url } = await request.json<{ url?: unknown }>()
 
-    // Validate input
     if (!url || typeof url !== 'string') {
       return new Response(JSON.stringify({ error: 'URL is required' }), {
         status: 400,
@@ -46,7 +43,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
       })
     }
 
-    // Comprehensive URL validation
     const validation = URLValidator.validate(url.trim())
     if (!validation.isValid) {
       return new Response(
@@ -60,7 +56,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
       )
     }
 
-    // Check if it's a nested shortener
     if (URLValidator.isShortener(url)) {
       return new Response(
         JSON.stringify({
@@ -73,7 +68,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
       )
     }
 
-    // Get D1 database from Cloudflare runtime
     const db = locals.runtime?.env?.DB
     if (!db) {
       console.error(
@@ -88,7 +82,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
       )
     }
 
-    // Check if URL already exists
     const existing = await db
       .prepare("SELECT code FROM links WHERE url = ? AND handle = ''")
       .bind(url)
@@ -104,7 +97,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
       })
     }
 
-    // Generate unique code
     let code: string
     let attempts = 0
     const maxAttempts = 10
@@ -120,12 +112,11 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
       attempts++
       if (attempts >= maxAttempts) {
-        code = generateCode(8) // Use longer code if collision
+        code = generateCode(8)
         break
       }
     } while (attempts < maxAttempts)
 
-    // Insert new link with metadata
     const result = await db
       .prepare(
         'INSERT INTO links (handle, code, url, created_at) VALUES (\'\', ?, ?, datetime("now"))'
@@ -147,7 +138,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
   } catch (error) {
     console.error('Error shortening URL:', error)
 
-    // Don't expose internal errors to users
+    // Internal errors stay out of the response.
     const isClientError = error instanceof SyntaxError // JSON parse error
     const statusCode = isClientError ? 400 : 500
     const message = isClientError

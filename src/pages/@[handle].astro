@@ -48,7 +48,7 @@ if (db && handle) {
 
 if (!page) Astro.response.status = 404
 
-// Group by section, keeping the order the sections first appear in.
+// Group by section, keeping the order sections first appear in.
 const sections: { name: string | null; links: PageLink[] }[] = []
 for (const link of links) {
   const last = sections[sections.length - 1]
@@ -56,11 +56,12 @@ for (const link of links) {
   else sections.push({ name: link.section, links: [link] })
 }
 
-const title = page ? page.title : 'Halaman tidak ditemukan'
+const title = page ? page.title : 'Page not found'
 
-// Warna dirender jadi CSS variable pada pembungkus. Nilainya sudah disaring
-// jadi #rrggbb di resolveTheme, jadi aman ditulis ke atribut style.
-const style = themeStyle(resolveTheme(page?.theme ?? 'brutal', page?.colors ?? null))
+// resolveTheme narrows these to #rrggbb.
+const style = themeStyle(
+  resolveTheme(page?.theme ?? 'noir', page?.colors ?? null)
+)
 ---
 
 <Layout title={title} description={page?.tagline ?? undefined}>
@@ -127,19 +128,19 @@ const style = themeStyle(resolveTheme(page?.theme ?? 'brutal', page?.colors ?? n
           </>
         ) : (
           <div class="text-center">
-            <h1 class="text-lg font-semibold">Halaman tidak ditemukan</h1>
+            <h1 class="text-lg font-semibold">Page not found</h1>
             <p class="mt-2 text-[var(--mb-muted)]">
-              Handle <span class="font-mono">@{handle}</span> belum dipakai.
+              Nobody has claimed <span class="font-mono">@{handle}</span> yet.
             </p>
             <a class="mt-6 inline-block text-sm underline" href="/">
-              Kembali ke Mambruk
+              Back to Mambruk
             </a>
           </div>
         )
       }
 
       <div class="mt-12 text-center text-sm text-[var(--mb-muted)]">
-        <a class="hover:text-neutral-800" href="/">Dibuat dengan Mambruk</a>
+        <a class="hover:text-neutral-800" href="/">Built with Mambruk</a>
       </div>
     </div>
   </main>

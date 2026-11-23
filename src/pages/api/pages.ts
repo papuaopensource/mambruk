@@ -3,14 +3,13 @@ import { getUser } from '../../utils/auth'
 import { isHandle } from '../../utils/code.js'
 import { THEME_NAMES, pickOverrides } from '../../utils/theme.js'
 
-// Klaim handle. Satu halaman per pengguna untuk sekarang; kuota per paket
-// menyusul bersama billing.
+// Claim a handle. One page per user for now.
 export const POST: APIRoute = async (context) => {
   const db = context.locals.runtime?.env?.DB
-  if (!db) return json({ error: 'Layanan sedang tidak tersedia' }, 503)
+  if (!db) return json({ error: 'Service unavailable' }, 503)
 
   const user = await getUser(context)
-  if (!user) return json({ error: 'Silakan masuk dulu' }, 401)
+  if (!user) return json({ error: 'Sign in first' }, 401)
 
   const form = await context.request.formData()
   const handle = String(form.get('handle') ?? '')
@@ -18,18 +17,17 @@ export const POST: APIRoute = async (context) => {
     .toLowerCase()
   const title = String(form.get('title') ?? '').trim()
   const tagline = String(form.get('tagline') ?? '').trim()
-  const theme = String(form.get('theme') ?? 'brutal').trim()
+  const theme = String(form.get('theme') ?? 'noir').trim()
 
   if (!isHandle(handle)) {
-    return json({ error: 'Handle tidak valid atau sudah dipesan sistem' }, 400)
+    return json({ error: 'Handle is invalid or reserved' }, 400)
   }
-  if (!title) return json({ error: 'Judul halaman wajib diisi' }, 400)
+  if (!title) return json({ error: 'Title is required' }, 400)
   if (!THEME_NAMES.includes(theme)) {
-    return json({ error: 'Tema tidak dikenal' }, 400)
+    return json({ error: 'Unknown theme' }, 400)
   }
 
-  // Hanya warna yang berbeda dari preset yang disimpan, dan hanya yang lolos
-  // pemeriksaan #rrggbb. Sisanya dibuang di sini, bukan saat render.
+  // Colours equal to the preset are not stored, so a new theme recolours all.
   const colors = pickOverrides(theme, {
     bg: form.get('bg'),
     surface: form.get('surface'),
@@ -45,7 +43,7 @@ export const POST: APIRoute = async (context) => {
     .bind(handle)
     .first<{ user_id: string | null }>()
   if (taken && taken.user_id !== user.id) {
-    return json({ error: 'Handle sudah dipakai' }, 409)
+    return json({ error: 'Handle is taken' }, 409)
   }
 
   const mine = await db
@@ -53,7 +51,7 @@ export const POST: APIRoute = async (context) => {
     .bind(user.id)
     .first<{ handle: string }>()
   if (mine && mine.handle !== handle) {
-    return json({ error: 'Kamu sudah punya halaman: @' + mine.handle }, 409)
+    return json({ error: 'You already have a page: @' + mine.handle }, 409)
   }
 
   await db

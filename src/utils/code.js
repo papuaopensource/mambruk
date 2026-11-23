@@ -1,28 +1,23 @@
-// Short-code shape. Plain JS so `node --test` can import it without a
-// TypeScript loader.
+// Short code, alias and handle shapes. Plain JS so node --test can import it.
 
 const ALPHABET =
   'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
 
-// 4..32 alnum/-/_ . Rejects anything with a dot (favicon.ico, robots.txt) and
-// short static route names, so the catch-all redirect never queries D1 for them.
+// 4-32 chars, no dots, so /favicon.ico and /robots.txt never reach D1.
 export const CODE_RE = /^[A-Za-z0-9_-]{4,32}$/
 
 export function isCode(value) {
   return typeof value === 'string' && CODE_RE.test(value)
 }
 
-// Alias pilihan manusia: huruf kecil, angka, - dan _. Boleh sependek "ig",
-// karena keunikannya per handle, bukan global.
+// Alias is unique per handle, so short ones like "ig" are fine.
 export const ALIAS_RE = /^[a-z0-9][a-z0-9_-]{0,31}$/
 
 export function isAlias(value) {
   return typeof value === 'string' && ALIAS_RE.test(value)
 }
 
-// Handle tidak boleh menabrak route statis di root, karena /@handle memang
-// dipisah dengan @ tapi dashboard, API, dan halaman produk hidup di /app,
-// /api, dst. Daftarnya pendek dan sengaja konservatif.
+// Reserved for product routes.
 const RESERVED_HANDLES = new Set([
   'api',
   'app',

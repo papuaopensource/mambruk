@@ -2,9 +2,8 @@ import type { APIContext } from 'astro'
 import { RATE_LIMITS, getClientIP } from './rateLimiter'
 import { isCode, isAlias } from './code.js'
 
-// Shared by /{code}, the legacy /r/{code}, and /@{handle}/{alias}.
-// `handle` is '' for the global namespace — an empty string, not NULL, so that
-// UNIQUE(handle, code) actually constrains those rows in SQLite.
+// handleRedirect serves /{code}, /r/{code} and /@{handle}/{alias}. handle is ''
+// for root codes, since SQLite's UNIQUE ignores NULLs.
 export async function handleRedirect(
   { params, locals, redirect, request }: APIContext,
   handle = ''
@@ -12,7 +11,7 @@ export async function handleRedirect(
   const code = handle ? params.alias : params.code
   const home = handle ? `/@${handle}` : '/'
 
-  // Cheap shape check first: never spend a D1 query on /robots.txt & friends.
+  // Shape check first, so /robots.txt costs no D1 query.
   if (!(handle ? isAlias(code) : isCode(code))) return redirect(home, 302)
 
   try {
@@ -36,7 +35,7 @@ export async function handleRedirect(
 
     if (!link) return redirect(home, 302)
 
-    // Fire and forget: the redirect should not wait on the counter.
+    // Fire and forget, so the redirect does not wait on the counter.
     db.prepare(
       'UPDATE links SET clicks = clicks + 1 WHERE handle = ? AND code = ?'
     )
@@ -57,8 +56,8 @@ export async function handleRedirect(
       return redirect(home, 302)
     }
 
-    // 302, not 301: a 301 is cached by the browser forever, which loses clicks
-    // and makes a link's destination impossible to change later.
+    // 302, not 301. Browsers cache 301 forever, losing clicks and pinning the
+    // destination.
     return redirect(link.url, 302)
   } catch (error) {
     console.error('Error redirecting:', error)

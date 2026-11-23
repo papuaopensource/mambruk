@@ -14,25 +14,25 @@ const user = await getUser(Astro)
         class="text-sm font-medium text-neutral-600 hover:text-neutral-900 underline underline-offset-4"
         href="/app"
       >
-        {user ? 'Dashboard' : 'Masuk'}
+        {user ? 'Dashboard' : 'Sign in'}
       </a>
     </nav>
 
     <div class="text-center">
       <h1 class="text-5xl font-extrabold tracking-tight">Mambruk</h1>
       <p class="mt-3 text-lg text-neutral-600">
-        Pendekkan URL dan kumpulkan semua tautanmu dalam satu halaman.
+        Shorten your links and gather them on one page.
       </p>
     </div>
 
-    <!-- Pemendek URL -->
+    <!-- Link shortener -->
     <section
       class="mt-10 bg-white border border-neutral-800 rounded-xl p-6 sm:p-8"
     >
       <p
         class="text-xs font-semibold uppercase tracking-widest text-neutral-400 mb-4"
       >
-        Pemendek URL
+        Link shortener
       </p>
 
       <form id="shortenForm" class="flex flex-col sm:flex-row gap-3">
@@ -40,7 +40,7 @@ const user = await getUser(Astro)
           type="url"
           id="urlInput"
           name="url"
-          placeholder="https://contoh.com/tautan/yang/panjang"
+          placeholder="https://example.com/a/very/long/link"
           required
           class="flex-1 px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-neutral-800 focus:outline-none transition-colors"
         />
@@ -49,7 +49,7 @@ const user = await getUser(Astro)
           id="shortenBtn"
           class="px-6 py-3 rounded-lg bg-neutral-800 text-white font-semibold hover:bg-neutral-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Pendekkan
+          Shorten
         </button>
       </form>
 
@@ -61,7 +61,7 @@ const user = await getUser(Astro)
           for="shortUrl"
           class="block text-sm font-semibold text-neutral-700 mb-2"
         >
-          Tautan pendekmu:
+          Your short link:
         </label>
         <div class="flex flex-col sm:flex-row gap-2">
           <input
@@ -75,7 +75,7 @@ const user = await getUser(Astro)
             type="button"
             class="px-4 py-2 rounded bg-neutral-800 text-white font-medium hover:bg-neutral-700 transition-colors"
           >
-            Salin
+            Copy
           </button>
         </div>
       </div>
@@ -88,17 +88,17 @@ const user = await getUser(Astro)
       </div>
     </section>
 
-    <!-- Halaman bio -->
+    <!-- Bio page -->
     <section
       class="mt-6 bg-white border border-neutral-800 rounded-xl p-6 sm:p-8"
     >
       <p
         class="text-xs font-semibold uppercase tracking-widest text-neutral-400 mb-4"
       >
-        Halaman Bio
+        Bio page
       </p>
       <p class="text-neutral-600">
-        Satu halaman untuk semua kanalmu, di
+        One page for every channel or social media you have, at
         <span class="font-mono text-neutral-800">mambr.uk/@handle</span>.
       </p>
       <a
@@ -111,21 +111,27 @@ const user = await getUser(Astro)
         <span
           class="relative flex items-center justify-center gap-3 rounded border border-neutral-800 bg-white px-5 py-3 group-hover:translate-x-1 group-hover:translate-y-1 group-focus:translate-x-1 group-focus:translate-y-1"
         >
-          Lihat contoh: @papuaopensource
+          See an example: @papuaopensource
         </span>
       </a>
       <p class="mt-4 text-sm text-neutral-500">
         {
           user ? (
-            <a class="underline underline-offset-4 hover:text-neutral-800" href="/app">
-              Kelola halamanmu di dashboard
+            <a
+              class="underline underline-offset-4 hover:text-neutral-800"
+              href="/app"
+            >
+              Manage your page in the dashboard
             </a>
           ) : (
             <>
-              <a class="underline underline-offset-4 hover:text-neutral-800" href="/app">
-                Masuk
-              </a>
-              {' '}dengan GitHub atau Google untuk bikin halamanmu sendiri.
+              <a
+                class="underline underline-offset-4 hover:text-neutral-800"
+                href="/app"
+              >
+                Sign in
+              </a>{' '}
+              with GitHub or Google to build your own page.
             </>
           )
         }
@@ -160,7 +166,7 @@ const user = await getUser(Astro)
     if (!url) return
 
     shortenBtn.disabled = true
-    shortenBtn.textContent = 'Memproses...'
+    shortenBtn.textContent = 'Shortening...'
     error.classList.add('hidden')
     result.classList.add('hidden')
 
@@ -170,18 +176,20 @@ const user = await getUser(Astro)
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url }),
       })
-      const data = await response.json()
-      if (!response.ok) throw new Error(data.error || 'Gagal memendekkan URL')
+      const data: { code?: string; error?: string } = await response.json()
+      if (!response.ok)
+        throw new Error(data.error || 'Could not shorten that URL')
 
       shortUrlInput.value = `${window.location.origin}/${data.code}`
       result.classList.remove('hidden')
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Terjadi kesalahan'
+      const message =
+        err instanceof Error ? err.message : 'Something went wrong'
       error.querySelector('p')!.textContent = message
       error.classList.remove('hidden')
     } finally {
       shortenBtn.disabled = false
-      shortenBtn.textContent = 'Pendekkan'
+      shortenBtn.textContent = 'Shorten'
     }
   })
 
@@ -192,7 +200,7 @@ const user = await getUser(Astro)
       shortUrlInput.select()
       document.execCommand('copy')
     }
-    copyBtn.textContent = 'Tersalin!'
-    setTimeout(() => (copyBtn.textContent = 'Salin'), 2000)
+    copyBtn.textContent = 'Copied'
+    setTimeout(() => (copyBtn.textContent = 'Copy'), 2000)
   })
 </script>
