@@ -67,6 +67,7 @@ pnpm build
 pnpm preview             # wrangler pages dev dist
 pnpm format              # prettier --write
 pnpm format:check
+pnpm types               # regenerate worker-configuration.d.ts
 ```
 
 Apply the schema to the local database once:
@@ -74,6 +75,9 @@ Apply the schema to the local database once:
 ```sh
 pnpm dlx wrangler d1 execute mambruk-db --local --file=./schema.sql
 ```
+
+Run `pnpm types` again after `wrangler.toml` or `.env` gains a binding or a
+variable.
 
 `.env` is read once at startup. Restart `pnpm dev` after editing it, or sessions
 fail as if the cookie were bad. Open `localhost`, not `127.0.0.1`: the OAuth
