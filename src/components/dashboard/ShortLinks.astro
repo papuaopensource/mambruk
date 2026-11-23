@@ -69,7 +69,10 @@ const ACTION_BUTTON =
           <form
             method="POST"
             action="/api/links"
-            data-confirm={`Hapus /@${handle}/${link.code}? Link ini akan berhenti bekerja di mana pun sudah dibagikan.`}
+            data-confirm="Hapus alias ini?"
+            data-confirm-text={`/@${handle}/${link.code} akan berhenti bekerja di mana pun link-nya sudah dibagikan.`}
+            data-confirm-label="Hapus"
+            data-confirm-danger
           >
             <input type="hidden" name="action" value="delete" />
             <input type="hidden" name="alias" value={link.code} />
@@ -120,14 +123,3 @@ const ACTION_BUTTON =
     </footer>
   </form>
 </section>
-
-<script>
-  // Deleting an alias breaks every copy already shared, so ask first.
-  for (const form of document.querySelectorAll<HTMLFormElement>(
-    'form[data-confirm]'
-  )) {
-    form.addEventListener('submit', (event) => {
-      if (!confirm(form.dataset.confirm)) event.preventDefault()
-    })
-  }
-</script>

@@ -4,6 +4,7 @@ import Layout from '../../layouts/Layout.astro'
 import SiteHeader from '../../components/SiteHeader.astro'
 import SiteFooter from '../../components/SiteFooter.astro'
 import UiIcon from '../../components/UiIcon.astro'
+import ConfirmDialog from '../../components/ConfirmDialog.astro'
 import PageSettings from '../../components/dashboard/PageSettings.astro'
 import PageLinks from '../../components/dashboard/PageLinks.astro'
 import ShortLinks from '../../components/dashboard/ShortLinks.astro'
@@ -93,7 +94,13 @@ const initial = (user.name ?? user.email).charAt(0).toUpperCase()
         {user.name ?? user.email}
       </span>
     </span>
-    <form method="POST" action="/api/auth/logout">
+    <form
+      method="POST"
+      action="/api/auth/logout"
+      data-confirm="Keluar dari Mambruk?"
+      data-confirm-text="Kamu perlu masuk lagi untuk mengatur halaman dan link-mu."
+      data-confirm-label="Keluar"
+    >
       <button class="btn btn-ghost">Keluar</button>
     </form>
   </SiteHeader>
@@ -130,4 +137,5 @@ const initial = (user.name ?? user.email).charAt(0).toUpperCase()
   </main>
 
   <SiteFooter />
+  <ConfirmDialog />
 </Layout>

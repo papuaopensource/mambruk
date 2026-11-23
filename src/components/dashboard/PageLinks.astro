@@ -77,7 +77,14 @@ const MOVES = [
           <p class="truncate text-xs text-neutral-400">{link.url}</p>
         </div>
 
-        <form method="POST" action="/api/page-links">
+        <form
+          method="POST"
+          action="/api/page-links"
+          data-confirm="Hapus tombol ini?"
+          data-confirm-text={`"${link.label}" akan hilang dari halaman bio-mu.`}
+          data-confirm-label="Hapus"
+          data-confirm-danger
+        >
           <input type="hidden" name="action" value="delete" />
           <input type="hidden" name="id" value={link.id} />
           <button
