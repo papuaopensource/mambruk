@@ -1,11 +1,12 @@
 name: CI
 
 # format -> typecheck + test -> build -> deploy. Pull requests stop after build.
+# master deploys to production, staging to a preview for review.
 on:
   push:
-    branches: [staging]
+    branches: [master, staging]
   pull_request:
-    branches: [staging]
+    branches: [master, staging]
 
 permissions:
   contents: read
@@ -86,8 +87,8 @@ jobs:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     environment:
-      name: production
-      url: https://mambr.uk
+      name: ${{ github.ref_name == 'master' && 'production' || 'preview' }}
+      url: ${{ github.ref_name == 'master' && 'https://mambr.uk' || '' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -102,7 +103,7 @@ jobs:
         with:
           name: dist
           path: dist
-      - run: pnpm exec wrangler pages deploy dist --project-name mambruk --branch staging
+      - run: pnpm exec wrangler pages deploy dist --project-name mambruk --branch ${{ github.ref_name }}
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
