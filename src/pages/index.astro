@@ -176,7 +176,7 @@ const user = await getUser(Astro)
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url }),
       })
-      const data = await response.json()
+      const data: { code?: string; error?: string } = await response.json()
       if (!response.ok)
         throw new Error(data.error || 'Could not shorten that URL')
 

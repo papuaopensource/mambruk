@@ -11,6 +11,7 @@ export const TOKENS = [
   'btn_border', // Button border and shadow
 ]
 
+/** @type {Record<string, Record<string, string>>} */
 export const THEMES = {
   noir: {
     label: 'Noir',
@@ -116,6 +117,7 @@ export function isHexColor(value) {
 // resolveTheme merges the owner's valid overrides onto the preset.
 export function resolveTheme(themeName, overridesJson) {
   const base = THEMES[themeName] ?? THEMES.noir
+  /** @type {Record<string, string>} */
   const colors = {}
   for (const token of TOKENS) colors[token] = base[token]
 
