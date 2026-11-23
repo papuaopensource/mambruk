@@ -1,0 +1,55 @@
+---
+import InfoPage from '../layouts/InfoPage.astro'
+import { HOST as host } from '../utils/site'
+
+export const prerender = false
+---
+
+<InfoPage
+  title="Tentang Mambruk"
+  intro="Pemendek link dan halaman bio yang gratis dan open source."
+>
+  <div class="prose-page">
+    <h2>Apa itu Mambruk</h2>
+    <p>
+      Mambruk punya dua fungsi. Yang pertama, memendekkan link panjang. Kamu
+      cukup menempelkan link di beranda, tanpa perlu membuat akun. Kalau sudah
+      masuk, kamu juga bisa memilih link sendiri, misalnya
+      <code>{host}/acara-kita</code>.
+    </p>
+    <p>
+      Yang kedua, halaman bio di <code>{host}/@handle</code>. Di situ kamu bisa
+      mengumpulkan link ke situs, media sosial, atau proyekmu, lalu cukup
+      membagikan satu alamat. Pemilik halaman juga bisa membuat alias seperti
+      <code>/@handle/ig</code> dan melihat berapa kali setiap alias dibuka.
+    </p>
+
+    <h2>Siapa yang membuat</h2>
+    <p>
+      Mambruk dibuat dan dikelola oleh
+      <a href="https://papuaopensource.org">Papua Open Source</a>. Kodenya
+      terbuka di <a href="https://github.com/papuaopensource/mambruk">GitHub</a>
+      dengan lisensi MIT, jadi siapa pun bisa melihat cara kerjanya, melaporkan
+      bug, atau ikut memperbaikinya.
+    </p>
+
+    <h2>Biaya</h2>
+    <p>Semua fiturnya gratis, dan tidak ada iklan.</p>
+
+    <h2>Cara kerjanya</h2>
+    <p>
+      Mambruk dibangun dengan Astro dan berjalan di Cloudflare Workers. Data
+      link dan halaman disimpan di Cloudflare D1, sedangkan pembatasan jumlah
+      permintaan memakai Cloudflare KV. Apa saja yang disimpan dijelaskan di
+      <a href="/privacy">Kebijakan Privasi</a>.
+    </p>
+
+    <h2>Mau ikut membantu?</h2>
+    <p>
+      Laporan bug, usulan fitur, dan pull request diterima di
+      <a href="https://github.com/papuaopensource/mambruk/issues">GitHub</a>.
+      Cara lain untuk menghubungi kami ada di halaman
+      <a href="/contact">Kontak</a>.
+    </p>
+  </div>
+</InfoPage>

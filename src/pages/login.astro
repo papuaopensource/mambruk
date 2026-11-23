@@ -1,0 +1,66 @@
+---
+import Layout from '../layouts/Layout.astro'
+import SiteHeader from '../components/SiteHeader.astro'
+import SiteFooter from '../components/SiteFooter.astro'
+import Logo from '../components/Logo.astro'
+import { getUser, PROVIDERS } from '../utils/auth'
+
+export const prerender = false
+
+const user = await getUser(Astro)
+if (user) return Astro.redirect('/dashboard', 302)
+
+// Codes the OAuth routes put in ?error=. Anything else shows nothing.
+const ERRORS: Record<string, string> = {
+  auth_unavailable: 'Login dengan layanan ini sedang tidak tersedia.',
+  state_mismatch: 'Sesi login kedaluwarsa. Coba masuk lagi.',
+  token_exchange: 'Login tidak berhasil diselesaikan. Coba masuk lagi.',
+  no_verified_email:
+    'Akunmu belum punya email yang terverifikasi. Verifikasi dulu, lalu coba lagi.',
+}
+const error = ERRORS[Astro.url.searchParams.get('error') ?? '']
+const providers = Object.entries(PROVIDERS)
+---
+
+<Layout title="Masuk - Mambruk">
+  <SiteHeader user={null} />
+
+  <main class="flex-1 bg-neutral-50">
+    <div class="mx-auto max-w-sm px-4 py-16 sm:py-24">
+      <div class="card p-8 text-center">
+        <Logo class="mx-auto size-12" />
+        <h1 class="mt-5 text-xl font-semibold tracking-tight">
+          Masuk ke Mambruk
+        </h1>
+        <p class="mt-1.5 text-sm text-pretty text-neutral-500">
+          Masuk untuk membuat halaman bio dan alias dengan handle-mu.
+        </p>
+        {error && <p
+          class="mt-5 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-left text-sm text-red-700"
+          role="alert"
+        >
+          {error}
+        </p>}
+        <div class="mt-7 flex flex-col gap-2.5">
+          {providers.map(([key, provider]) => <a
+            class="btn btn-secondary h-10 w-full"
+            href={`/api/auth/${key}`}
+          >
+            Lanjut dengan {provider.label}
+          </a>)}
+        </div>
+        <p class="mt-6 text-xs text-pretty text-neutral-400">
+          Kami menyimpan nama, email, dan foto profil dari akunmu. Selengkapnya
+          di
+          <a
+            class="underline underline-offset-2 hover:text-neutral-700"
+            href="/privacy"
+            >Kebijakan Privasi</a
+          >.
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <SiteFooter />
+</Layout>

@@ -1,0 +1,149 @@
+---
+import InfoPage from '../layouts/InfoPage.astro'
+import Faq from '../components/Faq.astro'
+import { HOST as host } from '../utils/site'
+
+export const prerender = false
+---
+
+<InfoPage
+  title="Pusat Bantuan"
+  intro="Jawaban untuk pertanyaan yang paling sering muncul. Kalau belum ketemu, hubungi kami."
+>
+  <div class="prose-page">
+    <h2>Link pendek</h2>
+    <Faq q="Bagaimana cara membuat link pendek?">
+      <p>
+        Tempel link panjang di kotak di <a href="/">beranda</a>, lalu tekan
+        Pendekkan. Tidak perlu akun.
+      </p>
+    </Faq>
+    <Faq q="Kenapa link-ku ditolak?">
+      <p>Link akan ditolak kalau:</p>
+      <ul>
+        <li>
+          alamatnya tidak diawali <code>http</code> atau <code>https</code>;
+        </li>
+        <li>memakai alamat IP langsung, bukan nama domain;</li>
+        <li>
+          berasal dari layanan pemendek lain, seperti <code>bit.ly</code> atau
+          <code>tinyurl.com</code>;
+        </li>
+        <li>
+          mengarah ke file program, seperti <code>.exe</code> atau
+          <code>.bat</code>;
+        </li>
+        <li>panjangnya lebih dari 2.048 karakter;</li>
+        <li>alamatnya mengandung pola yang sering dipakai untuk spam.</li>
+      </ul>
+    </Faq>
+    <Faq q="Apakah ada batasnya?">
+      <p>
+        Ada. Dari satu alamat IP, kamu bisa membuat 10 link pendek dan membuka
+        100 link per menit. Kalau lewat batas, tunggu sebentar lalu coba lagi.
+      </p>
+    </Faq>
+    <Faq q="Bisakah link pendek diubah atau dihapus?">
+      <p>
+        Belum bisa dari situs. Link yang dibuat tanpa akun tidak terhubung ke
+        siapa pun, jadi kalau ada link yang perlu dihapus, hubungi kami lewat
+        halaman <a href="/contact">Kontak</a>.
+      </p>
+    </Faq>
+    <Faq q="Berapa lama link pendek berlaku?">
+      <p>Tidak ada masa berlaku. Link tetap aktif sampai dihapus.</p>
+    </Faq>
+    <Faq q="Bisakah memilih link sendiri?">
+      <p>
+        Bisa, kalau sudah <a href="/login">masuk</a>. Di beranda akan muncul
+        kolom kedua untuk link custom, misalnya <code>{host}/acara-kita</code>.
+        Panjangnya 4 sampai 32 karakter, berisi huruf, angka, tanda hubung, atau
+        garis bawah. Beberapa kata seperti <code>about</code> dan
+        <code>login</code> tidak bisa dipakai. Link yang kamu buat saat masuk
+        muncul di dashboard.
+      </p>
+    </Faq>
+    <Faq q="Kenapa ada hitungan mundur sebelum link dibuka?">
+      <p>
+        Link yang dibuat tanpa akun menampilkan alamat tujuannya dulu, supaya
+        kamu bisa melihat ke mana link itu mengarah. Setelah 3 detik halaman
+        tujuan terbuka sendiri. Kamu juga bisa menekan Buka sekarang, atau Batal
+        kalau alamatnya terlihat aneh. Alias dan link milik pengguna yang sudah
+        masuk langsung dibuka.
+      </p>
+    </Faq>
+
+    <h2>Halaman bio</h2>
+    <Faq q="Bagaimana cara membuat halaman bio?">
+      <p>
+        <a href="/login">Masuk</a> dengan GitHub atau Google, buka dashboard,
+        pilih handle, isi judul, lalu tekan Klaim handle. Halamanmu langsung
+        bisa dibuka di <code>{host}/@handle</code>.
+      </p>
+    </Faq>
+    <Faq q="Apa aturan handle?">
+      <p>
+        Panjangnya 2 sampai 30 karakter, berisi huruf kecil, angka, dan tanda
+        hubung, dan diawali huruf atau angka. Beberapa kata seperti
+        <code>about</code>, <code>help</code>, dan <code>admin</code>
+        dicadangkan.
+      </p>
+    </Faq>
+    <Faq q="Bisakah handle diganti?">
+      <p>
+        Belum. Setiap akun punya satu halaman, dan handle-nya tidak bisa diubah
+        setelah diklaim.
+      </p>
+    </Faq>
+    <Faq q="Bagaimana mengatur tombol di halaman bio?">
+      <p>
+        Buka bagian Tombol di dashboard. Di sana kamu bisa menambah tombol,
+        mengubah urutannya dengan panah naik dan turun, atau menghapusnya.
+        Tombol berurutan yang punya nama bagian sama tampil dalam satu kelompok.
+      </p>
+    </Faq>
+    <Faq q="Bagaimana mengganti tema dan warna?">
+      <p>
+        Pilih tema di dashboard. Untuk warna lain, buka Atur warna sendiri.
+        Preview di sebelahnya langsung berubah, dan halamanmu ikut berubah
+        setelah kamu menyimpan.
+      </p>
+    </Faq>
+
+    <h2>Alias</h2>
+    <Faq q="Apa itu alias?">
+      <p>
+        Link pendek di bawah handle-mu, misalnya <code>{host}/@handle/ig</code>.
+        Lebih mudah diingat daripada kode acak, dan jumlah kliknya terlihat di
+        dashboard.
+      </p>
+    </Faq>
+    <Faq q="Apa aturan alias?">
+      <p>
+        Panjangnya 1 sampai 32 karakter, berisi huruf kecil, angka, tanda
+        hubung, dan garis bawah, dan diawali huruf atau angka. Alias hanya bisa
+        dibuat di bawah handle milikmu sendiri.
+      </p>
+    </Faq>
+    <Faq q="Bagaimana klik dihitung?">
+      <p>
+        Setiap kali alias atau link milikmu dibuka, angkanya bertambah satu.
+        Mambruk tidak mencatat siapa yang membukanya.
+      </p>
+    </Faq>
+
+    <h2>Akun</h2>
+    <Faq q="Bisa masuk pakai apa?">
+      <p>
+        GitHub atau Google. Kami menyimpan nama, email, dan foto profil dari
+        akun itu. Selengkapnya ada di <a href="/privacy">Kebijakan Privasi</a>.
+      </p>
+    </Faq>
+    <Faq q="Bagaimana cara menghapus akun?">
+      <p>
+        Belum ada tombol hapus akun di dashboard. Hubungi kami lewat halaman
+        <a href="/contact">Kontak</a> dan sebutkan akun yang ingin dihapus.
+      </p>
+    </Faq>
+  </div>
+</InfoPage>

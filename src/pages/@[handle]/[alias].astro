@@ -1,0 +1,15 @@
+---
+import RedirectPage from '../../components/RedirectPage.astro'
+import { handleRedirect } from '../../utils/redirect'
+
+// Short links owned by one handle, created from the dashboard.
+export const prerender = false
+
+const target = await handleRedirect(
+  Astro,
+  String(Astro.params.handle ?? '').toLowerCase()
+)
+if (target instanceof Response) return target
+---
+
+<RedirectPage url={target} />

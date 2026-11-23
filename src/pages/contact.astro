@@ -1,0 +1,68 @@
+---
+import InfoPage from '../layouts/InfoPage.astro'
+import Icon from '../components/Icon.astro'
+import UiIcon from '../components/UiIcon.astro'
+
+export const prerender = false
+
+const ISSUES = 'https://github.com/papuaopensource/mambruk/issues'
+
+const CHANNELS = [
+  {
+    title: 'Bug dan usulan fitur',
+    text: 'Buka issue di GitHub. Ceritakan apa yang terjadi dan langkah untuk mengulanginya, atau fitur apa yang kamu butuhkan.',
+    links: [{ label: 'Buka issue', href: `${ISSUES}/new` }],
+  },
+  {
+    title: 'Link yang disalahgunakan',
+    text: 'Kalau kamu menemukan link pendek atau halaman bio yang dipakai untuk penipuan, phishing, atau malware, laporkan lewat issue dan sertakan link-nya.',
+    links: [{ label: 'Laporkan link', href: `${ISSUES}/new` }],
+  },
+  {
+    title: 'Hapus data, keamanan, dan hal pribadi',
+    text: 'Untuk menghapus akun atau link, melaporkan celah keamanan, atau hal lain yang tidak cocok dibahas di tempat umum, hubungi Papua Open Source langsung. Jangan tulis detail celah keamanan di issue.',
+    links: [
+      { label: 'papuaopensource.org', href: 'https://papuaopensource.org' },
+      {
+        label: '@papuaopensource',
+        href: 'https://x.com/papuaopensource',
+        icon: 'x',
+        service: 'X',
+      },
+    ],
+  },
+]
+---
+
+<InfoPage
+  title="Kontak"
+  intro="Mambruk dikelola Papua Open Source. Pilih jalur yang paling sesuai dengan keperluanmu."
+>
+  <div class="grid gap-4">
+    {CHANNELS.map((channel) => <section class="card p-6">
+      <h2 class="font-semibold">{channel.title}</h2>
+      <p class="mt-1.5 text-[15px] leading-7 text-pretty text-neutral-600">
+        {channel.text}
+      </p>
+      <div class="mt-4 flex flex-wrap gap-2">
+        {channel.links.map((link) => <a
+          class="btn btn-secondary"
+          href={link.href}
+        >
+          {link.icon && <Icon name={link.icon} class="size-3.5" />}
+          {link.service && <span class="sr-only">{link.service}</span>}
+          {link.label}
+          <UiIcon name="arrow-up-right" class="size-3.5" />
+        </a>)}
+      </div>
+    </section>)}
+  </div>
+  <p class="mt-8 text-sm text-neutral-500">
+    Pertanyaan umum soal cara pakai mungkin sudah terjawab di
+    <a
+      class="font-medium text-neutral-900 underline underline-offset-4"
+      href="/help"
+      >Pusat Bantuan</a
+    >.
+  </p>
+</InfoPage>

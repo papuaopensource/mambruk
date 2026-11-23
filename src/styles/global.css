@@ -2,6 +2,18 @@
 
 @theme {
   --font-sans: 'Inter Tight', system-ui, sans-serif;
+
+  /* Slate blue of the mambruk, the crowned pigeon (Goura) of Papua. */
+  --color-goura-50: #f3f6fb;
+  --color-goura-100: #e4eaf5;
+  --color-goura-200: #c9d5ea;
+  --color-goura-300: #a0b5d8;
+  --color-goura-400: #7590c2;
+  --color-goura-500: #5573ae;
+  --color-goura-600: #435b93;
+  --color-goura-700: #384a77;
+  --color-goura-800: #313f62;
+  --color-goura-900: #2c3752;
 }
 
 /* Tailwind 3 defaults that version 4 dropped. */
@@ -14,5 +26,93 @@
   input::placeholder,
   textarea::placeholder {
     color: var(--color-gray-400);
+  }
+}
+
+@utility btn {
+  @apply inline-flex h-9 items-center justify-center gap-2 rounded-full px-4 text-sm font-medium whitespace-nowrap transition-colors focus-visible:ring-4 focus-visible:ring-goura-200 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+@utility btn-primary {
+  @apply bg-neutral-900 text-white shadow-xs hover:bg-neutral-700;
+}
+
+@utility btn-secondary {
+  @apply border border-neutral-200 bg-white text-neutral-900 shadow-xs hover:border-neutral-300 hover:bg-neutral-50;
+}
+
+@utility btn-ghost {
+  @apply text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900;
+}
+
+@utility card {
+  @apply rounded-xl border border-neutral-200 bg-white shadow-xs;
+}
+
+@utility field {
+  @apply block h-10 w-full rounded-lg border border-neutral-200 bg-white px-3 text-sm text-neutral-900 shadow-xs transition placeholder:text-neutral-400 read-only:bg-neutral-50 read-only:text-neutral-500 focus:border-goura-400 focus:ring-4 focus:ring-goura-100 focus:outline-hidden;
+}
+
+@utility field-label {
+  @apply mb-1.5 block text-sm font-medium text-neutral-700;
+}
+
+/* Text box glued to the left of a field, such as the host before a handle. */
+@utility field-addon {
+  @apply inline-flex shrink-0 items-center rounded-l-lg border border-r-0 border-neutral-200 bg-neutral-50 px-3 font-mono text-xs text-neutral-500;
+}
+
+@utility badge {
+  @apply inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white/80 px-3 py-1 text-xs font-medium text-neutral-600 shadow-xs backdrop-blur;
+}
+
+/* Faint grid that fades out from the top, behind heroes. */
+@utility bg-grid {
+  background-image:
+    linear-gradient(to right, var(--color-neutral-200) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-neutral-200) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(
+    ellipse 70% 60% at 50% 0%,
+    #000 35%,
+    transparent 100%
+  );
+}
+
+/* Long-form text on the about, help, privacy and terms pages. */
+@layer components {
+  .prose-page {
+    @apply text-[15px] leading-7 text-neutral-700;
+  }
+  .prose-page h2 {
+    @apply mt-12 mb-3 text-xl font-semibold tracking-tight text-neutral-900 first:mt-0;
+  }
+  .prose-page h3 {
+    @apply mt-8 mb-2 font-semibold text-neutral-900;
+  }
+  .prose-page p {
+    @apply my-4;
+  }
+  .prose-page ul {
+    @apply my-4 list-disc space-y-2 pl-5 marker:text-neutral-400;
+  }
+  .prose-page a {
+    @apply font-medium text-neutral-900 underline decoration-neutral-300 underline-offset-4 hover:decoration-neutral-900;
+  }
+  .prose-page code {
+    @apply rounded-md bg-neutral-100 px-1.5 py-0.5 font-mono text-[13px] text-neutral-800;
+  }
+  .prose-page strong {
+    @apply font-semibold text-neutral-900;
+  }
+}
+
+/* Progress bar on the redirect page. Its length comes from RedirectPage. */
+@keyframes countdown-bar {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
   }
 }

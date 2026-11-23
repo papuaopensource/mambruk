@@ -1,0 +1,43 @@
+---
+import Icon from './Icon.astro'
+
+const LINKS = [
+  { label: 'Tentang', href: '/about' },
+  { label: 'Bantuan', href: '/help' },
+  { label: 'Kontak', href: '/contact' },
+  { label: 'Privasi', href: '/privacy' },
+  { label: 'Ketentuan', href: '/terms' },
+]
+---
+
+<footer class="border-t border-neutral-200 bg-white">
+  <div class="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <nav class="flex flex-wrap gap-x-5 gap-y-2 text-sm text-neutral-600">
+        {LINKS.map((link) => <a class="hover:text-neutral-900" href={link.href}
+          >{link.label}</a
+        >)}
+      </nav>
+      <a
+        class="btn btn-ghost -ml-2.5 h-8 px-2.5 sm:-mr-2.5 sm:ml-0"
+        href="https://github.com/papuaopensource/mambruk"
+      >
+        <Icon name="github" class="size-4" />
+        GitHub
+      </a>
+    </div>
+    <div
+      class="mt-6 flex flex-col gap-2 border-t border-neutral-100 pt-6 text-sm text-neutral-500 sm:flex-row sm:items-center sm:justify-between"
+    >
+      <p>
+        &copy; 2026
+        <a
+          class="font-medium text-neutral-700 hover:text-neutral-900"
+          href="https://github.com/papuaopensource"
+          >Papua Open Source</a
+        >
+      </p>
+      <p>Short links and bio pages, free and open source.</p>
+    </div>
+  </div>
+</footer>

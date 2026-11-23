@@ -1,0 +1,12 @@
+---
+import RedirectPage from '../../components/RedirectPage.astro'
+import { handleRedirect } from '../../utils/redirect'
+
+// Legacy path from the standalone shortener. New links are minted at the root.
+export const prerender = false
+
+const target = await handleRedirect(Astro)
+if (target instanceof Response) return target
+---
+
+<RedirectPage url={target} />

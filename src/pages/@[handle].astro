@@ -2,6 +2,8 @@
 import { env } from 'cloudflare:workers'
 import Layout from '../layouts/Layout.astro'
 import Icon from '../components/Icon.astro'
+import UiIcon from '../components/UiIcon.astro'
+import Logo from '../components/Logo.astro'
 import { resolveTheme, themeStyle } from '../utils/theme.js'
 
 export const prerender = false
@@ -67,66 +69,71 @@ const style = themeStyle(resolveTheme(page.theme, page.colors))
   image={page.avatar_url ?? undefined}
 >
   <main
-    class="flex items-center justify-center min-h-screen p-4 bg-[var(--mb-bg)] text-[var(--mb-fg)]"
+    class="flex flex-1 justify-center bg-[var(--mb-bg)] px-4 py-10 text-[var(--mb-fg)] sm:py-16"
     style={style}
   >
-    <div
-      class="w-full max-w-xl bg-[var(--mb-surface)] shadow-sm rounded-xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-16"
-    >
-      <div class="mx-auto text-center">
-        {page.avatar_url && (
-          <img
-            src={page.avatar_url}
-            alt={`Logo ${page.title}`}
-            class="w-40 h-40 mx-auto rounded-lg"
-          />
-        )}
-        <h1 class="mt-6 text-lg font-semibold text-[var(--mb-fg)]">
-          {page.title}
-        </h1>
-        {page.tagline && <p class="mt-2 text-[var(--mb-muted)]">
-          {page.tagline}
-        </p>}
-      </div>
-
-      <div class="mt-8 mx-auto flex flex-col gap-8">
-        {sections.map((section) => <div>
-          {section.name && <p
-            class="text-xs font-semibold uppercase tracking-widest text-[var(--mb-muted)] mb-3"
+    <div class="w-full max-w-md">
+      <div
+        class="rounded-3xl border border-[var(--mb-fg)]/10 bg-[var(--mb-surface)] px-5 py-10 shadow-sm sm:px-8"
+      >
+        <div class="text-center">
+          {page.avatar_url && (
+            <img
+              src={page.avatar_url}
+              alt={`Logo ${page.title}`}
+              class="mx-auto size-24 rounded-full object-cover shadow-sm ring-4 ring-[var(--mb-bg)]"
+            />
+          )}
+          <h1 class="mt-5 text-xl font-semibold tracking-tight">
+            {page.title}
+          </h1>
+          {page.tagline && <p
+            class="mx-auto mt-2 max-w-xs text-sm text-pretty text-[var(--mb-muted)]"
           >
-            {section.name}
+            {page.tagline}
           </p>}
-          <div class="grid grid-cols-1 gap-4">
-            {section.links.map((link) => <a
-              class="group relative inline-block text-sm font-medium text-[var(--mb-btn_fg)] focus:outline-hidden"
-              href={link.url}
-              target="_blank"
-              rel="noopener noreferrer"
+        </div>
+
+        <div class="mt-9 flex flex-col gap-7">
+          {sections.map((section) => <div>
+            {section.name && <p
+              class="mb-3 text-center text-[11px] font-medium tracking-[0.14em] text-[var(--mb-muted)] uppercase"
             >
-              <span
-                class="absolute inset-0 translate-x-1.5 translate-y-1.5 bg-[var(--mb-btn_border)] rounded-sm"
-              />
-              <span
-                class="relative flex items-center justify-center gap-3 rounded-sm border border-[var(--mb-btn_border)] bg-[var(--mb-btn_bg)] px-4 py-4 group-hover:translate-x-1 group-hover:translate-y-1 group-focus:translate-x-1 group-focus:translate-y-1"
+              {section.name}
+            </p>}
+            <div class="flex flex-col gap-3">
+              {section.links.map((link) => <a
+                class="group flex items-center gap-3 rounded-2xl border border-[var(--mb-btn_border)] bg-[var(--mb-btn_bg)] px-4 py-3.5 text-[var(--mb-btn_fg)] transition duration-150 hover:-translate-y-0.5 hover:shadow-[0_4px_0_0_var(--mb-btn_border)] focus-visible:ring-4 focus-visible:ring-[var(--mb-btn_border)]/30 focus-visible:outline-hidden"
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
               >
                 <Icon name={link.icon} />
-                <span class="flex flex-col items-center">
-                  <span>{link.label}</span>
+                <span class="min-w-0 flex-1 text-center">
+                  <span class="block text-sm font-medium">{link.label}</span>
                   {link.description && <span
-                    class="text-xs font-normal text-[var(--mb-muted)]"
+                    class="mt-0.5 block text-xs text-[var(--mb-muted)]"
                   >
                     {link.description}
                   </span>}
                 </span>
-              </span>
-            </a>)}
-          </div>
-        </div>)}
+                <UiIcon
+                  name="arrow-up-right"
+                  class="size-4 shrink-0 opacity-40 transition group-hover:opacity-80"
+                />
+              </a>)}
+            </div>
+          </div>)}
+        </div>
       </div>
 
-      <div class="mt-12 text-center text-sm text-[var(--mb-muted)]">
-        <a class="hover:text-neutral-800" href="/">Built with Mambruk</a>
-      </div>
+      <a
+        class="mx-auto mt-6 flex w-fit items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium text-[var(--mb-muted)] transition hover:text-[var(--mb-fg)]"
+        href="/"
+      >
+        <Logo class="size-4" />
+        Dibuat dengan Mambruk
+      </a>
     </div>
   </main>
 </Layout>

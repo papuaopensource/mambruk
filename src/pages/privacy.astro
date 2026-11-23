@@ -1,0 +1,110 @@
+---
+import InfoPage from '../layouts/InfoPage.astro'
+
+export const prerender = false
+---
+
+<InfoPage
+  title="Kebijakan Privasi"
+  intro="Data apa saja yang disimpan Mambruk, untuk apa, dan cara menghapusnya."
+  updated="23 November 2026"
+>
+  <div class="prose-page">
+    <h2>Singkatnya</h2>
+    <ul>
+      <li>
+        Kamu bisa memendekkan link tanpa akun. Yang disimpan link-nya, bukan
+        identitasmu.
+      </li>
+      <li>
+        Kalau masuk dengan GitHub atau Google, kami menyimpan nama, email, dan
+        foto profil dari akun itu.
+      </li>
+      <li>
+        Mambruk tidak memasang skrip analytics atau iklan, dan tidak mencatat
+        siapa yang membuka sebuah link. Yang dicatat hanya jumlah kliknya.
+      </li>
+    </ul>
+
+    <h2>Data yang kami simpan</h2>
+    <h3>Link pendek</h3>
+    <p>
+      Untuk setiap link pendek kami menyimpan alamat tujuan, kode pendeknya,
+      waktu dibuat, dan jumlah klik. Link yang dibuat tanpa akun tidak terhubung
+      ke siapa pun. Link yang kamu buat saat sudah masuk menyimpan ID akunmu,
+      supaya muncul di dashboard.
+    </p>
+    <h3>Akun</h3>
+    <p>
+      Saat kamu masuk dengan GitHub atau Google, kami menyimpan ID akunmu di
+      layanan itu, alamat email, nama, dan alamat foto profil. Data ini dipakai
+      untuk mengenali akunmu dan menampilkan namamu di dashboard.
+    </p>
+    <h3>Halaman bio</h3>
+    <p>
+      Handle, judul, tagline, tema, warna, dan tombol yang kamu tambahkan,
+      termasuk label, link, keterangan, bagian, dan ikonnya. Semua ini tampil
+      publik di halaman bio-mu.
+    </p>
+    <h3>Cookie</h3>
+    <p>Mambruk memakai dua cookie, dan keduanya untuk login:</p>
+    <ul>
+      <li>
+        <code>mambruk_session</code> menandai bahwa kamu sudah masuk. Berlaku 30
+        hari, atau sampai kamu keluar.
+      </li>
+      <li>
+        <code>mambruk_oauth_state</code> dipakai selama proses login dan berlaku
+        10 menit.
+      </li>
+    </ul>
+    <p>Tidak ada cookie iklan atau cookie pelacak.</p>
+
+    <h2>Data yang disimpan sementara</h2>
+    <p>
+      Untuk membatasi jumlah permintaan, alamat IP-mu dipakai sebagai kunci
+      penghitung di Cloudflare KV, bersama waktu setiap permintaan. Data ini
+      terhapus otomatis setelah sekitar satu menit.
+    </p>
+
+    <h2>Pihak lain yang terlibat</h2>
+    <ul>
+      <li>
+        <strong>GitHub dan Google</strong>, kalau kamu masuk dengan akun mereka.
+        Kebijakan privasi mereka berlaku untuk akunmu di sana.
+      </li>
+      <li>
+        <strong>Cloudflare</strong>, tempat Mambruk berjalan dan datanya
+        disimpan. Semua permintaan ke Mambruk melewati jaringan Cloudflare.
+      </li>
+      <li>
+        <strong>Bunny Fonts</strong>, penyedia huruf situs ini. Browser-mu
+        mengambil file huruf dari <code>fonts.bunny.net</code>.
+      </li>
+      <li>
+        <strong>Situs tujuan.</strong> Saat membuka link pendek, kamu diarahkan
+        ke situs lain yang punya aturan privasinya sendiri.
+      </li>
+    </ul>
+
+    <h2>Berapa lama data disimpan</h2>
+    <p>
+      Link, akun, dan halaman bio disimpan sampai dihapus. Sesi login berakhir
+      setelah 30 hari dan tidak bisa dipakai lagi.
+    </p>
+
+    <h2>Menghapus data</h2>
+    <p>
+      Tombol di halaman bio bisa kamu hapus sendiri dari dashboard. Untuk
+      menghapus akun, halaman bio, alias, atau link pendek, hubungi kami lewat
+      halaman <a href="/contact">Kontak</a> dan sebutkan handle atau link yang
+      dimaksud.
+    </p>
+
+    <h2>Perubahan</h2>
+    <p>
+      Kalau kebijakan ini berubah, versi barunya dipasang di halaman ini dengan
+      tanggal yang diperbarui.
+    </p>
+  </div>
+</InfoPage>

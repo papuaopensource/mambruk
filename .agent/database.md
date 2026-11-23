@@ -10,6 +10,9 @@ D1 database `mambruk-db`, binding `DB`.
 | `pages`      | bio pages; `user_id` owns the handle                                       |
 | `page_links` | ordered links on a bio page, grouped by `section`                          |
 
+`links.user_id` owns the root links a user made while signed in. Anonymous links
+keep NULL.
+
 ## Schema and migrations
 
 `schema.sql` is the shape for fresh databases and never migrates an existing one,
