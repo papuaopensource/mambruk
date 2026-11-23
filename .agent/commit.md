@@ -26,10 +26,10 @@ chore: switch repo language to English
 
 ## Branches
 
-`feat/add-*` and `chore/*`, stacked on the branch they build on. Code merges
-into `staging`, the production branch on Cloudflare Pages, and `staging` merges
-into `master`, the default branch. Docs-only changes may go straight to
-`master`; fast-forward `staging` after.
+`feat/add-*` and `chore/*`, stacked on the branch they build on. Pull requests
+target `staging`, which deploys a preview for review. `staging` merges into
+`master`, which deploys to production at `mambr.uk`. Docs-only changes may go
+straight to `master`; fast-forward `staging` after.
 
 ## Workflow
 

@@ -1,7 +1,7 @@
 # Mambruk
 
-[![CI](https://github.com/papuaopensource/mambruk/actions/workflows/ci.yml/badge.svg?branch=staging)](https://github.com/papuaopensource/mambruk/actions/workflows/ci.yml)
-[![CodeQL](https://github.com/papuaopensource/mambruk/actions/workflows/codeql.yml/badge.svg?branch=staging)](https://github.com/papuaopensource/mambruk/actions/workflows/codeql.yml)
+[![CI](https://github.com/papuaopensource/mambruk/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/papuaopensource/mambruk/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/papuaopensource/mambruk/actions/workflows/codeql.yml/badge.svg?branch=master)](https://github.com/papuaopensource/mambruk/actions/workflows/codeql.yml)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/papuaopensource/mambruk/badge)](https://scorecard.dev/viewer/?uri=github.com/papuaopensource/mambruk)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
@@ -54,7 +54,8 @@ pnpm test
 pnpm build
 ```
 
-Pushes to `staging` run these checks in CI and deploy to Cloudflare Pages.
+Pull requests go to `staging`, which deploys a preview for review. Merging
+`staging` into `master` deploys to production.
 
 ## License
 
