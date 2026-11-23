@@ -27,10 +27,13 @@ domain. Short links live at `mambr.uk/{code}`, bio pages at
 
 ## Stack
 
-- Astro 5 on Cloudflare Pages
-- Cloudflare D1 database
+- Astro 5 + TypeScript, server rendered with `@astrojs/cloudflare`
+- Cloudflare Pages for hosting
+- Cloudflare D1 (SQLite) database
 - Cloudflare KV for rate limiting
-- Tailwind CSS
+- Tailwind CSS v3
+- OAuth with GitHub and Google, sessions signed with Web Crypto
+- Wrangler for local development and deploys
 - pnpm as package manager
 
 ## Getting Started
