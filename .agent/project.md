@@ -18,6 +18,7 @@ Mambruk is a URL shortener and link-in-bio pages, run by Papua Open Source at
 .agent/                      working notes for coding agents
 src/pages/
   index.astro                landing: shorten form and bio page entry
+  404.astro                  unknown codes, handles and paths
   [code].ts                  /{code}, 302 to the target
   r/[code].ts                legacy /r/{code}, same handler
   @[handle].astro            bio page from D1

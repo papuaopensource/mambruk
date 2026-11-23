@@ -6,14 +6,14 @@ import { isCode, isAlias } from './code.js'
 // handleRedirect serves /{code}, /r/{code} and /@{handle}/{alias}. handle is ''
 // for root codes, since SQLite's UNIQUE ignores NULLs.
 export async function handleRedirect(
-  { params, redirect, request }: APIContext,
+  { params, redirect, request, rewrite }: APIContext,
   handle = ''
 ) {
   const code = handle ? params.alias : params.code
   const home = handle ? `/@${handle}` : '/'
 
   // Shape check first, so /robots.txt costs no D1 query.
-  if (!(handle ? isAlias(code) : isCode(code))) return redirect(home, 302)
+  if (!(handle ? isAlias(code) : isCode(code))) return rewrite('/404')
 
   try {
     const rateLimitKV = env.RATE_LIMITER
@@ -34,7 +34,7 @@ export async function handleRedirect(
       .bind(handle, code)
       .first<{ url: string }>()
 
-    if (!link) return redirect(home, 302)
+    if (!link) return rewrite('/404')
 
     // Fire and forget, so the redirect does not wait on the counter.
     db.prepare(
