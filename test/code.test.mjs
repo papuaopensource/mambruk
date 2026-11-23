@@ -1,6 +1,12 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { isCode, isAlias, isHandle, generateCode } from '../src/utils/code.js'
+import {
+  isCode,
+  isAlias,
+  isCustomCode,
+  isHandle,
+  generateCode,
+} from '../src/utils/code.js'
 
 test('isCode accepts generated codes', () => {
   for (let i = 0; i < 200; i++) assert.ok(isCode(generateCode()))
@@ -59,9 +65,25 @@ test('isHandle accepts valid handles and rejects reserved ones', () => {
     'API',
     'app',
     'admin',
+    'contact',
     'a/b',
     '-x',
     'x'.repeat(31),
   ])
     assert.equal(isHandle(bad), false, bad)
+})
+
+test('isCustomCode takes picked codes and refuses reserved routes', () => {
+  for (const ok of ['papua-dev', 'Workshop_2026', 'abcd'])
+    assert.ok(isCustomCode(ok), ok)
+  for (const bad of [
+    'abc',
+    'about',
+    'About',
+    'LOGIN',
+    'dashboard',
+    'a.b.c',
+    'x'.repeat(33),
+  ])
+    assert.equal(isCustomCode(bad), false, bad)
 })
