@@ -5,11 +5,12 @@
 Mambruk is a URL shortener and link-in-bio pages, run by Papua Open Source at
 `mambr.uk`.
 
-- Astro 5, `output: 'server'`, adapter `@astrojs/cloudflare` with `platformProxy`
-- Cloudflare Pages, D1 (`DB`) for data, KV (`RATE_LIMITER`) for rate limiting
-- Tailwind CSS 3 through `@astrojs/tailwind`
+- Astro 7, `output: 'server'`, adapter `@astrojs/cloudflare`, dev and preview
+  in workerd
+- Cloudflare Workers, D1 (`DB`) for data, KV (`RATE_LIMITER`) for rate limiting
+- Tailwind CSS 4 through `@tailwindcss/vite`, theme in `src/styles/global.css`
 - TypeScript strict; plain `.js` for logic that tests import
-- `pnpm` 9, Node 18+
+- `pnpm` 9, Node 22.23.4+
 
 ## Repository Layout
 
@@ -36,6 +37,7 @@ src/utils/
   icons.js                   named icon map
   urlValidator.ts            target URL checks
   rateLimiter.ts             sliding window over KV
+src/styles/global.css        Tailwind entry and theme
 src/components/, src/layouts/
 public/assets/               logo, favicons
 schema.sql                   shape of a fresh database
@@ -45,8 +47,8 @@ test/                        node --test files
 
 ## Environment Variables
 
-Local values go in `.env` (template `.env.example`); production values are Pages
-secrets.
+Local values go in `.env` (template `.env.example`); production values are
+Worker secrets (`wrangler secret put`).
 
 ```
 AUTH_SECRET            signs the session cookie, 32+ characters
@@ -64,7 +66,7 @@ pnpm dev                 # astro dev with local D1 and KV in .wrangler/state
 pnpm test                # node --test test/*.test.mjs
 pnpm check               # astro check, types in .ts and .astro
 pnpm build
-pnpm preview             # wrangler pages dev dist
+pnpm preview             # astro preview, the built Worker in workerd
 pnpm format              # prettier --write
 pnpm format:check
 pnpm types               # regenerate worker-configuration.d.ts
@@ -76,8 +78,8 @@ Apply the schema to the local database once:
 pnpm dlx wrangler d1 execute mambruk-db --local --file=./schema.sql
 ```
 
-Run `pnpm types` again after `wrangler.toml` or `.env` gains a binding or a
-variable.
+Run `pnpm types` again after `wrangler.toml` or `.env.example` gains a binding
+or a variable.
 
 `.env` is read once at startup. Restart `pnpm dev` after editing it, or sessions
 fail as if the cookie were bad. Open `localhost`, not `127.0.0.1`: the OAuth

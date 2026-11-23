@@ -1,6 +1,6 @@
 name = "mambruk"
+main = "@astrojs/cloudflare/entrypoints/server"
 compatibility_date = "2026-08-01"
-pages_build_output_dir = "dist"
 
 # D1 Database
 [[d1_databases]]

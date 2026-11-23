@@ -1,0 +1,18 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Inter Tight', system-ui, sans-serif;
+}
+
+/* Tailwind 3 defaults that version 4 dropped. */
+@layer base {
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--color-gray-400);
+  }
+}

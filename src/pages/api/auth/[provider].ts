@@ -10,7 +10,7 @@ export const GET: APIRoute = async (context) => {
   const provider = context.params.provider
   if (!isProvider(provider)) return context.redirect('/', 302)
 
-  const creds = credentials(context.locals, provider)
+  const creds = credentials(provider)
   if (!creds) {
     return new Response(
       `${PROVIDERS[provider].label} login is not configured on the server.`,
