@@ -1,28 +1,29 @@
 import type { APIContext } from 'astro'
+import { env } from 'cloudflare:workers'
 import { RATE_LIMITS, getClientIP } from './rateLimiter'
 import { isCode, isAlias } from './code.js'
 
 // handleRedirect serves /{code}, /r/{code} and /@{handle}/{alias}. handle is ''
 // for root codes, since SQLite's UNIQUE ignores NULLs.
 export async function handleRedirect(
-  { params, locals, redirect, request }: APIContext,
+  { params, redirect, request, rewrite }: APIContext,
   handle = ''
 ) {
   const code = handle ? params.alias : params.code
   const home = handle ? `/@${handle}` : '/'
 
   // Shape check first, so /robots.txt costs no D1 query.
-  if (!(handle ? isAlias(code) : isCode(code))) return redirect(home, 302)
+  if (!(handle ? isAlias(code) : isCode(code))) return rewrite('/404')
 
   try {
-    const rateLimitKV = locals.runtime?.env?.RATE_LIMITER
+    const rateLimitKV = env.RATE_LIMITER
     const rateLimit = await RATE_LIMITS.REDIRECTS.checkLimit(
       rateLimitKV,
       getClientIP(request)
     )
     if (!rateLimit.allowed) return redirect(home, 302)
 
-    const db = locals.runtime?.env?.DB
+    const db = env.DB
     if (!db) {
       console.error('Database not available')
       return redirect(home, 302)
@@ -33,7 +34,7 @@ export async function handleRedirect(
       .bind(handle, code)
       .first<{ url: string }>()
 
-    if (!link) return redirect(home, 302)
+    if (!link) return rewrite('/404')
 
     // Fire and forget, so the redirect does not wait on the counter.
     db.prepare(

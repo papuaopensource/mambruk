@@ -11,8 +11,8 @@ Non-trivial logic leaves one runnable check behind.
 
 The pre-commit hook runs Prettier on staged files and `pnpm test`. CI chains
 the same steps as jobs, format, then typecheck and test, then build. A push to
-`staging` deploys that build as a preview, a push to `master` deploys it to
-production. Pull requests stop before the deploy.
+`staging` uploads that build as a preview version of the Worker, a push to
+`master` deploys it to production. Pull requests stop before the deploy.
 
 Before finishing a change:
 
