@@ -1,0 +1,107 @@
+---
+// Short stop between a short link and its target, so the reader sees where it
+// goes before leaving. Without JS the meta refresh takes over.
+import Layout from '../layouts/Layout.astro'
+import Logo from './Logo.astro'
+import UiIcon from './UiIcon.astro'
+
+export interface Props {
+  url: string
+}
+
+const SECONDS = 3
+const { url } = Astro.props
+const host = new URL(url).host
+---
+
+<Layout
+  title={`Membuka ${host}`}
+  description={`Link pendek dari Mambruk menuju ${host}.`}
+  noindex
+>
+  <noscript slot="head">
+    <meta http-equiv="refresh" content={`${SECONDS};url=${url}`} />
+  </noscript>
+
+  <main
+    class="relative isolate flex flex-1 items-center justify-center overflow-hidden bg-neutral-50 px-4 py-16"
+  >
+    <div class="bg-grid absolute inset-0 -z-10" aria-hidden="true"></div>
+    <div
+      id="redirect"
+      class="card w-full max-w-md p-8 text-center"
+      data-url={url}
+      data-seconds={SECONDS}
+    >
+      <Logo class="mx-auto size-10" />
+      <p class="mt-6 text-sm text-neutral-500">Kamu akan dibawa ke</p>
+      <p class="mt-1 text-2xl font-semibold tracking-tight break-all">{host}</p>
+      <p class="mt-2 line-clamp-2 font-mono text-xs break-all text-neutral-500">
+        {url}
+      </p>
+
+      <div class="mt-8 h-1.5 overflow-hidden rounded-full bg-neutral-100">
+        <div
+          id="redirect-bar"
+          class="h-full origin-left rounded-full bg-neutral-900"
+          style={`animation: countdown-bar ${SECONDS}s linear forwards`}
+        ></div>
+      </div>
+      <p
+        id="redirect-status"
+        class="mt-3 text-sm text-neutral-600"
+        aria-live="polite"
+      >
+        Dibuka dalam <span id="redirect-count">{SECONDS}</span> detik
+      </p>
+
+      <div class="mt-6 flex flex-wrap justify-center gap-3">
+        <a class="btn btn-primary" href={url}>
+          Buka sekarang
+          <UiIcon name="arrow-up-right" class="size-3.5" />
+        </a>
+        <button id="redirect-cancel" type="button" class="btn btn-secondary">
+          Batal
+        </button>
+      </div>
+
+      <p class="mt-8 text-xs text-pretty text-neutral-400">
+        Mambruk tidak memeriksa isi situs tujuan. Pastikan alamatnya sesuai
+        harapanmu, atau
+        <a
+          class="underline underline-offset-2 hover:text-neutral-700"
+          href="/contact"
+          >laporkan link ini</a
+        >.
+      </p>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  const root = document.getElementById('redirect') as HTMLElement
+  const count = document.getElementById('redirect-count') as HTMLElement
+  const status = document.getElementById('redirect-status') as HTMLElement
+  const bar = document.getElementById('redirect-bar') as HTMLElement
+  const cancel = document.getElementById('redirect-cancel') as HTMLElement
+  const url = root.dataset.url ?? '/'
+  let left = Number(root.dataset.seconds)
+
+  const timer = setInterval(() => {
+    left -= 1
+    if (left > 0) {
+      count.textContent = String(left)
+      return
+    }
+    clearInterval(timer)
+    // replace, so Back skips this page.
+    location.replace(url)
+  }, 1000)
+
+  cancel.addEventListener('click', () => {
+    clearInterval(timer)
+    bar.style.animationPlayState = 'paused'
+    status.textContent = 'Pengalihan dibatalkan.'
+    cancel.remove()
+  })
+</script>

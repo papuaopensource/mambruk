@@ -6,9 +6,9 @@ import { isCode, isAlias } from './code.js'
 // handleRedirect serves /{code}, /r/{code} and /@{handle}/{alias}. handle is ''
 // for root codes, since SQLite's UNIQUE ignores NULLs.
 export async function handleRedirect(
-  { params, redirect, request, rewrite }: APIContext,
+  { params, redirect, request, rewrite, locals }: APIContext,
   handle = ''
-) {
+): Promise<string | Response> {
   const code = handle ? params.alias : params.code
   const home = handle ? `/@${handle}` : '/'
 
@@ -37,14 +37,16 @@ export async function handleRedirect(
     if (!link) return rewrite('/404')
 
     // Fire and forget, so the redirect does not wait on the counter.
-    db.prepare(
-      'UPDATE links SET clicks = clicks + 1 WHERE handle = ? AND code = ?'
-    )
+    const counting = db
+      .prepare(
+        'UPDATE links SET clicks = clicks + 1 WHERE handle = ? AND code = ?'
+      )
       .bind(handle, code)
       .run()
       .catch((error: unknown) => {
         console.error('Failed to update click count:', error)
       })
+    locals.cfContext?.waitUntil(counting)
 
     try {
       const target = new URL(link.url)
@@ -57,9 +59,7 @@ export async function handleRedirect(
       return redirect(home, 302)
     }
 
-    // 302, not 301. Browsers cache 301 forever, losing clicks and pinning the
-    // destination.
-    return redirect(link.url, 302)
+    return link.url
   } catch (error) {
     console.error('Error redirecting:', error)
     return redirect(home, 302)
