@@ -50,9 +50,15 @@ export function isHandle(value) {
   )
 }
 
+// generateCode keeps 6 bits of each random byte and skips 62 and 63, so every
+// character has the same odds.
 export function generateCode(length = 6) {
-  const bytes = crypto.getRandomValues(new Uint8Array(length))
   let out = ''
-  for (const b of bytes) out += ALPHABET[b % ALPHABET.length]
+  while (out.length < length) {
+    for (const b of crypto.getRandomValues(new Uint8Array(length))) {
+      const i = b >> 2
+      if (i < ALPHABET.length && out.length < length) out += ALPHABET[i]
+    }
+  }
   return out
 }
