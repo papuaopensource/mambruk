@@ -45,6 +45,10 @@
   @apply text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900;
 }
 
+@utility btn-danger {
+  @apply bg-red-600 text-white shadow-xs hover:bg-red-700 focus-visible:ring-red-200;
+}
+
 @utility card {
   @apply rounded-xl border border-neutral-200 bg-white shadow-xs;
 }

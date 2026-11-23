@@ -1,0 +1,59 @@
+---
+// One confirm dialog per page. A form with data-confirm opens it instead of
+// submitting, and the dialog's action button sends that form. Optional
+// data-confirm-text, data-confirm-label and data-confirm-danger fill it in.
+---
+
+<dialog
+  id="confirm-dialog"
+  class="m-auto w-[min(24rem,calc(100vw-2rem))] max-w-none bg-transparent p-0 backdrop:bg-neutral-900/40 backdrop:backdrop-blur-[2px]"
+  aria-labelledby="confirm-title"
+  aria-describedby="confirm-text"
+>
+  <form method="dialog" class="card w-full p-6">
+    <h2
+      id="confirm-title"
+      class="text-base font-semibold text-neutral-900"
+    ></h2>
+    <p id="confirm-text" class="mt-2 text-sm text-pretty text-neutral-600"></p>
+    <div class="mt-6 flex justify-end gap-2">
+      <button value="cancel" class="btn btn-secondary" autofocus>Batal</button>
+      <button id="confirm-ok" value="confirm" class="btn btn-primary"></button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+  const dialog = document.getElementById('confirm-dialog') as HTMLDialogElement
+  const title = document.getElementById('confirm-title') as HTMLElement
+  const text = document.getElementById('confirm-text') as HTMLElement
+  const ok = document.getElementById('confirm-ok') as HTMLButtonElement
+  let pending: HTMLFormElement | null = null
+
+  document.addEventListener('submit', (event) => {
+    const form = event.target
+    if (!(form instanceof HTMLFormElement) || !form.dataset.confirm) return
+    event.preventDefault()
+    pending = form
+    const danger = 'confirmDanger' in form.dataset
+    title.textContent = form.dataset.confirm
+    text.textContent = form.dataset.confirmText ?? ''
+    text.hidden = !form.dataset.confirmText
+    ok.textContent = form.dataset.confirmLabel ?? 'Lanjut'
+    ok.classList.toggle('btn-danger', danger)
+    ok.classList.toggle('btn-primary', !danger)
+    dialog.returnValue = ''
+    dialog.showModal()
+  })
+
+  // A click on the backdrop lands on the dialog itself, outside the card.
+  dialog.addEventListener('click', (event) => {
+    if (event.target === dialog) dialog.close('cancel')
+  })
+
+  // submit() skips the submit event, so the form goes out without asking again.
+  dialog.addEventListener('close', () => {
+    if (dialog.returnValue === 'confirm') pending?.submit()
+    pending = null
+  })
+</script>
