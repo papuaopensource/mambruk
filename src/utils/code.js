@@ -31,6 +31,7 @@ const RESERVED = new Set([
   'support',
   'terms',
   'privacy',
+  'palette',
   'settings',
   'dashboard',
   'mambruk',
