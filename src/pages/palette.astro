@@ -17,7 +17,7 @@ const GOURA = [
   ['800', '#313f62'],
   ['900', '#2c3752'],
 ]
-// Tailwind 4 neutral, from oklch to hex.
+// Tailwind 4 neutral
 const NEUTRAL = [
   ['50', '#fafafa'],
   ['100', '#f5f5f5'],
@@ -62,8 +62,8 @@ const SCALES = [
   <SiteHeader />
 
   <main class="mx-auto w-full max-w-5xl flex-1 px-4 py-12 sm:px-6">
-    <h1 class="text-3xl font-semibold tracking-tight">Palet</h1>
-    <p class="mt-2 text-neutral-600">Klik warna untuk menyalin kodenya.</p>
+    <h1 class="text-3xl font-semibold tracking-tight">Palette</h1>
+    <p class="mt-2 text-neutral-600">Klik warna untuk salin kode hex.</p>
 
     {SCALES.map((scale) => <section class="mt-12">
       <h2 class="text-lg font-semibold tracking-tight">{scale.title}</h2>
