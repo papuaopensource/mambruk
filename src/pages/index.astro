@@ -14,33 +14,18 @@ const user = await getUser(Astro)
 const FEATURES = [
   {
     icon: 'link',
-    title: 'Tanpa akun',
-    text: `Tempel link panjang, langsung dapat versi pendeknya di ${host}.`,
+    title: 'Tanpa daftar',
+    text: 'Tempel link, langsung dapat versi pendeknya.',
   },
   {
     icon: 'at',
-    title: 'Alias dengan handle',
-    text: `Buat link seperti ${host}/@kamu/ig yang mudah diingat.`,
+    title: 'Gampang diingat',
+    text: `Pakai namamu sendiri, misalnya ${host}/@kamu/ig.`,
   },
   {
     icon: 'chart',
     title: 'Jumlah klik',
-    text: 'Lihat berapa kali setiap link milikmu dibuka, langsung di dashboard.',
-  },
-  {
-    icon: 'palette',
-    title: 'Tema dan warna',
-    text: 'Pilih tema untuk halaman bio, lalu ubah warnanya kalau perlu.',
-  },
-  {
-    icon: 'shield',
-    title: 'Pemeriksaan link',
-    text: 'Link dari layanan pemendek lain, alamat IP, dan file program ditolak. Jumlah permintaan per menit juga dibatasi.',
-  },
-  {
-    icon: 'code',
-    title: 'Open source',
-    text: 'Kodenya terbuka di GitHub dengan lisensi MIT. Siapa pun boleh membaca dan ikut memperbaikinya.',
+    text: 'Lihat berapa kali link-mu dibuka.',
   },
 ] as const
 
@@ -231,7 +216,7 @@ const PREVIEW_LINKS = [
       <p class="mx-auto mt-2 max-w-md text-center text-pretty text-neutral-600">
         Semua fitur gratis dan tanpa iklan.
       </p>
-      <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div class="mt-10 grid gap-4 sm:grid-cols-3">
         {FEATURES.map((feature) => <div class="card p-5">
           <span
             class="flex size-9 items-center justify-center rounded-lg border border-neutral-200 bg-neutral-50 text-goura-600"
