@@ -82,6 +82,7 @@ test('isCustomCode takes picked codes and refuses reserved routes', () => {
     'About',
     'LOGIN',
     'dashboard',
+    'palette',
     'a.b.c',
     'x'.repeat(33),
   ])
