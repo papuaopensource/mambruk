@@ -1,0 +1,132 @@
+---
+// Colours of the site, for people working on the design
+// indexed.
+import Layout from '../layouts/Layout.astro'
+import SiteHeader from '../components/SiteHeader.astro'
+import SiteFooter from '../components/SiteFooter.astro'
+
+const GOURA = [
+  ['50', '#f3f6fb'],
+  ['100', '#e4eaf5'],
+  ['200', '#c9d5ea'],
+  ['300', '#a0b5d8'],
+  ['400', '#7590c2'],
+  ['500', '#5573ae'],
+  ['600', '#435b93'],
+  ['700', '#384a77'],
+  ['800', '#313f62'],
+  ['900', '#2c3752'],
+]
+// Tailwind 4 neutral, from oklch to hex.
+const NEUTRAL = [
+  ['50', '#fafafa'],
+  ['100', '#f5f5f5'],
+  ['200', '#e5e5e5'],
+  ['300', '#d4d4d4'],
+  ['400', '#a1a1a1'],
+  ['500', '#737373'],
+  ['600', '#525252'],
+  ['700', '#404040'],
+  ['800', '#262626'],
+  ['900', '#171717'],
+  ['950', '#0a0a0a'],
+]
+const STATUS = [
+  ['Berhasil', '#10b981'],
+  ['Bahaya', '#dc2626'],
+  ['Latar bahaya', '#fef2f2'],
+]
+
+const swatch = ([name, hex]: string[]) => ({ name, hex })
+
+const SCALES = [
+  {
+    title: 'Goura',
+    colors: GOURA.map(swatch),
+    base: '600',
+  },
+  {
+    title: 'Netral',
+    colors: NEUTRAL.map(swatch),
+    base: '',
+  },
+  {
+    title: 'Status',
+    colors: STATUS.map(swatch),
+    base: '',
+  },
+]
+---
+
+<Layout title="Palet - Mambruk" noindex>
+  <SiteHeader />
+
+  <main class="mx-auto w-full max-w-5xl flex-1 px-4 py-12 sm:px-6">
+    <h1 class="text-3xl font-semibold tracking-tight">Palet</h1>
+    <p class="mt-2 text-neutral-600">Klik warna untuk menyalin kodenya.</p>
+
+    {SCALES.map((scale) => <section class="mt-12">
+      <h2 class="text-lg font-semibold tracking-tight">{scale.title}</h2>
+      <div class="mt-4 grid grid-cols-5 gap-x-2 gap-y-4 sm:grid-cols-11">
+        {scale.colors.map((color) => <button
+          type="button"
+          class="group grid cursor-pointer gap-2 text-left"
+          data-hex={color.hex}
+          aria-label={`Salin ${color.hex}`}
+        >
+          <span
+            class:list={[
+              'block h-16 rounded-lg ring-1 ring-black/5 ring-inset group-focus-visible:outline-3 group-focus-visible:outline-offset-2 group-focus-visible:outline-goura-500',
+              color.name === scale.base &&
+                'outline-2 outline-offset-2 outline-neutral-900',
+            ]}
+            style={`background:${color.hex}`}
+          ></span>
+          <span class="text-xs">
+            <span class="block font-semibold">{color.name}</span>
+            <span class="block font-mono text-neutral-500">{color.hex}</span>
+          </span>
+        </button>)}
+      </div>
+    </section>)}
+
+    <section class="mt-12">
+      <h2 class="text-lg font-semibold tracking-tight">Dipakai di situs</h2>
+      <div class="mt-4 grid gap-4 md:grid-cols-3">
+        <div class="card grid content-start gap-3 p-6">
+          <span class="text-sm font-medium text-goura-600">Sekarang</span>
+          <div class="flex flex-wrap gap-2">
+            <span class="btn btn-primary">Buat halaman bio</span>
+            <span class="btn btn-secondary">Lihat contoh</span>
+          </div>
+        </div>
+        <div class="card grid content-start gap-3 p-6">
+          <span class="text-sm font-medium text-goura-600"> Tombol biru </span>
+          <div class="flex flex-wrap gap-2">
+            <span class="btn bg-goura-600 text-white">Buat halaman bio</span>
+            <span class="btn btn-secondary">Lihat contoh</span>
+          </div>
+        </div>
+        <div class="card grid content-start gap-3 p-6">
+          <span class="text-sm font-medium text-goura-600">Hapus</span>
+          <div class="flex flex-wrap gap-2">
+            <span class="btn btn-danger">Hapus</span>
+            <span class="btn btn-secondary">Batal</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter />
+</Layout>
+
+<script>
+  for (const button of document.querySelectorAll<HTMLButtonElement>(
+    'button[data-hex]'
+  )) {
+    button.addEventListener('click', () => {
+      navigator.clipboard.writeText(button.dataset.hex ?? '').catch(() => {})
+    })
+  }
+</script>
