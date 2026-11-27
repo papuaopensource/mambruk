@@ -8,6 +8,21 @@ const LINKS = [
   { label: 'Privasi', href: '/privacy' },
   { label: 'Ketentuan', href: '/terms' },
 ]
+
+const SOCIALS = [
+  { icon: 'globe', label: 'Website', href: 'https://papuaopensource.org/' },
+  {
+    icon: 'instagram',
+    label: 'Instagram',
+    href: 'https://www.instagram.com/papuaopensource/',
+  },
+  { icon: 'x', label: 'X', href: 'https://x.com/papuaopensource' },
+  {
+    icon: 'github',
+    label: 'GitHub',
+    href: 'https://github.com/papuaopensource/mambruk',
+  },
+]
 ---
 
 <footer class="border-t border-neutral-200 bg-white">
@@ -18,13 +33,16 @@ const LINKS = [
           >{link.label}</a
         >)}
       </nav>
-      <a
-        class="btn btn-ghost -ml-2.5 h-8 px-2.5 sm:-mr-2.5 sm:ml-0"
-        href="https://github.com/papuaopensource/mambruk"
-      >
-        <Icon name="github" class="size-4" />
-        GitHub
-      </a>
+      <div class="flex gap-2">
+        {SOCIALS.map((social) => <a
+          class="flex size-9 items-center justify-center rounded-full bg-neutral-900 text-white hover:bg-neutral-700"
+          href={social.href}
+          aria-label={social.label}
+          title={social.label}
+        >
+          <Icon name={social.icon} class="size-4" />
+        </a>)}
+      </div>
     </div>
     <div
       class="mt-6 flex flex-col gap-2 border-t border-neutral-100 pt-6 text-sm text-neutral-500 sm:flex-row sm:items-center sm:justify-between"
@@ -37,7 +55,6 @@ const LINKS = [
           >Papua Open Source</a
         >
       </p>
-      <p>Short links and bio pages, free and open source.</p>
     </div>
   </div>
 </footer>
